@@ -39,7 +39,7 @@ public class PrometeoCarController : MonoBehaviour
       [Range(1, 10)]
       public int decelerationMultiplier = 2; // How fast the car decelerates when the user is not using the throttle.
       [Range(1, 10)]
-      public int handbrakeDriftMultiplier = 5; // How much grip the car loses when the user hit the handbrake.
+      public int handbrakeDriftMultiplier = 5; // How much drift the car loses when the user hit the handbrake.
       [Space(10)]
       public Vector3 bodyMassCenter; // This is a vector that contains the center of mass of the car. I recommend to set this value
                                     // in the points x = 0 and z = 0 of your car. You can select the value that you want in the y axis,
@@ -738,7 +738,7 @@ public class PrometeoCarController : MonoBehaviour
 
       //If the 'driftingAxis' value is not 0f, it means that the wheels have not recovered their traction.
       //We are going to continue decreasing the sideways friction of the wheels until we reach the initial
-      // car's grip.
+      // car's drift.
       if(FLwheelFriction.extremumSlip > FLWextremumSlip){
         FLwheelFriction.extremumSlip = FLWextremumSlip * handbrakeDriftMultiplier * driftingAxis;
         frontLeftCollider.sidewaysFriction = FLwheelFriction;

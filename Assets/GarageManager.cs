@@ -10,7 +10,7 @@ public class CarStats
     public float speed;          // Speed stat
     public float handling;       // Handling stat
     public float acceleration;   // Acceleration stat
-    public float grip;           // Grip stat
+    public float drift;           // Drift stat
     public float braking;        // Braking stat
 }
 
@@ -50,9 +50,25 @@ public class GarageManager : MonoBehaviour
     public void SwitchCar(int direction)
     {
         // Update the index
-        currentCarIndex = (currentCarIndex + direction + carPrefabs.Count) % carPrefabs.Count;
+        currentCarIndex = (currentCarIndex + direction%12 + carPrefabs.Count) % carPrefabs.Count;
 
         // Activate the new car
+        InitializeCar();
+    }
+    public void SwitchCarColor(int colorIndex)
+    {
+        int startIndex = 0;
+        if (currentCarIndex > 3 && currentCarIndex < 8)
+        {
+            startIndex = 4;
+        }
+        else if (currentCarIndex >= 8)
+        {
+            startIndex = 8;
+        }
+
+        currentCarIndex = startIndex + colorIndex;
+
         InitializeCar();
     }
 
@@ -66,7 +82,7 @@ public class GarageManager : MonoBehaviour
         statSliders[0].value = stats.speed;
         statSliders[1].value = stats.handling;
         statSliders[2].value = stats.acceleration;
-        statSliders[3].value = stats.grip;
+        statSliders[3].value = stats.drift;
         statSliders[4].value = stats.braking;
     }
 
