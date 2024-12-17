@@ -5,7 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/MultiRacing/Scenes/OutdoorsScene.unity
     guid: 8124e5870f4fd4c779e7a5f994e84ad1
+  - enabled: 1
+    path: Assets/MultiRacing/Scenes/Main Menu.unity
+    guid: b85f6776ac10b754da28ea02b1d5d67c
+  - enabled: 1
+    path: Assets/MultiRacing/Scenes/Garage.unity
+    guid: 22a66e1a6ed62934b9feeb5a167cbaed
+  - enabled: 1
+    path: Assets/MultiRacing/Scenes/Racing.unity
+    guid: da740b2d9c904bc4e9c8e304b034e397
   m_configObjects: {}

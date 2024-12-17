@@ -17,6 +17,6 @@ public class GameManager : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        SceneManager.LoadScene("Intro");
+        SceneManager.LoadScene(sceneName);
     }
 }
