@@ -55,6 +55,7 @@ public class GarageManager : MonoBehaviour
         // Activate the new car
         InitializeCar();
     }
+
     public void SwitchCarColor(int colorIndex)
     {
         int startIndex = 0;
@@ -88,7 +89,9 @@ public class GarageManager : MonoBehaviour
 
     public void ConfirmSelection()
     {
-        Debug.Log($"Selected Car: {carStats[currentCarIndex].carName}");
-        // Proceed to the next scene or gameplay
+        GameObject selectedCar = carPrefabs[currentCarIndex];
+        GameManager.Instance.SetSelectedCar(selectedCar);
+        Debug.Log($"Selected Car: {selectedCar.name}");
+        GameManager.Instance.LoadScene("Racing"); // Load the race scene
     }
 }
