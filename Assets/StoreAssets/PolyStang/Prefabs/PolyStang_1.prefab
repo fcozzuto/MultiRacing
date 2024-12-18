@@ -380,6 +380,7 @@ GameObject:
   - component: {fileID: 3398106580824784545}
   - component: {fileID: 5618575825336952164}
   - component: {fileID: 3398106580507080865}
+  - component: {fileID: 2911489458625431270}
   - component: {fileID: 3398106580824784547}
   m_Layer: 0
   m_Name: PolyStang_1
@@ -550,6 +551,54 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &2911489458625431270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663456704294997890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0fefceefe666bb4682b272ec8c5bdd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSpeed: 130
+  maxReverseSpeed: 45
+  accelerationMultiplier: 6
+  maxSteeringAngle: 35
+  steeringSpeed: 0.5
+  brakeForce: 450
+  decelerationMultiplier: 2
+  handbrakeDriftMultiplier: 4
+  bodyMassCenter: {x: 0, y: 0, z: 0}
+  frontLeftMesh: {fileID: 5979557620761577061}
+  frontLeftCollider: {fileID: 3398106580507080877}
+  frontRightMesh: {fileID: 1917998726845408817}
+  frontRightCollider: {fileID: 3398106580507080878}
+  rearLeftMesh: {fileID: 4409633903809265692}
+  rearLeftCollider: {fileID: 3398106580507080879}
+  rearRightMesh: {fileID: 6311886845423106955}
+  rearRightCollider: {fileID: 7498782597212933370}
+  useEffects: 1
+  RLWParticleSystem: {fileID: 3813831264010688489}
+  RRWParticleSystem: {fileID: 3813831262012190593}
+  RLWTireSkid: {fileID: 8383480285774031682}
+  RRWTireSkid: {fileID: 1351233069120416346}
+  useUI: 0
+  carSpeedText: {fileID: 0}
+  useSounds: 1
+  carEngineSound: {fileID: 3398106580824784547}
+  tireScreechSound: {fileID: 5618575824624948739}
+  useTouchControls: 0
+  throttleButton: {fileID: 0}
+  reverseButton: {fileID: 0}
+  turnRightButton: {fileID: 0}
+  turnLeftButton: {fileID: 0}
+  handbrakeButton: {fileID: 0}
+  carSpeed: 0
+  isDrifting: 0
+  isTractionLocked: 0
 --- !u!82 &3398106580824784547
 AudioSource:
   m_ObjectHideFlags: 0
@@ -563,7 +612,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 936bf151add95ea4fbd98fecd83943c5, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -730,7 +779,7 @@ GameObject:
   - component: {fileID: 1813649545831061807}
   - component: {fileID: 1813649545831061806}
   m_Layer: 0
-  m_Name: SkitSmokeParticle
+  m_Name: FL_SkitSmokeParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5612,8 +5661,8 @@ Transform:
   m_Children:
   - {fileID: 5293161150208340522}
   - {fileID: 2939944934162365156}
-  - {fileID: 6464417717444785128}
   - {fileID: 5757960765290645777}
+  - {fileID: 6464417717444785128}
   m_Father: {fileID: 2044099471898219832}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2005404612945069221
@@ -5660,7 +5709,7 @@ GameObject:
   - component: {fileID: 438686941037774888}
   - component: {fileID: 8383480285774031682}
   m_Layer: 0
-  m_Name: SkidMark
+  m_Name: RL_SkidMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11762,7 +11811,7 @@ GameObject:
   - component: {fileID: 3813831262012190593}
   - component: {fileID: 3813831262012190592}
   m_Layer: 0
-  m_Name: SkitSmokeParticle
+  m_Name: RR_SkitSmokeParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16592,7 +16641,7 @@ GameObject:
   - component: {fileID: 3813831262783921294}
   - component: {fileID: 3813831262783921295}
   m_Layer: 0
-  m_Name: SkitSmokeParticle
+  m_Name: FR_SkitSmokeParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21422,7 +21471,7 @@ GameObject:
   - component: {fileID: 3813831264010688489}
   - component: {fileID: 3813831264010688488}
   m_Layer: 0
-  m_Name: SkitSmokeParticle
+  m_Name: RL_SkitSmokeParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26251,7 +26300,7 @@ GameObject:
   - component: {fileID: 1886686529626008281}
   - component: {fileID: 7521089388138891699}
   m_Layer: 0
-  m_Name: SkidMark
+  m_Name: FR_SkidMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26723,7 +26772,7 @@ GameObject:
   - component: {fileID: 6957523510009465136}
   - component: {fileID: 1351233069120416346}
   m_Layer: 0
-  m_Name: SkidMark
+  m_Name: RR_SkidMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31963,7 +32012,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 56dc2dadf37dd3e46a7588a22fd70f67, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0
+  m_Volume: 1
   m_Pitch: 0.8
   Loop: 1
   Mute: 0
@@ -32770,7 +32819,7 @@ GameObject:
   - component: {fileID: 5819905361508727737}
   - component: {fileID: 2489057395364042963}
   m_Layer: 0
-  m_Name: SkidMark
+  m_Name: FL_SkidMark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
