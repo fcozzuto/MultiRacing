@@ -8,6 +8,7 @@ P.S: If you need more cars, you can check my other vehicle assets on the Unity A
 something useful for your game. Best regards, Mena.
 */
 
+using PolyStang;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -144,12 +145,14 @@ public class PrometeoCarController : MonoBehaviour
       float localVelocityX;
       bool deceleratingCar;
       bool touchControlsSetup = false;
-      /*
-      The following variables are used to store information about sideways friction of the wheels (such as
-      extremumSlip,extremumValue, asymptoteSlip, asymptoteValue and stiffness). We change this values to
-      make the car to start drifting.
-      */
-      WheelFrictionCurve FLwheelFriction;
+      private CarLights carLights;
+
+    /*
+    The following variables are used to store information about sideways friction of the wheels (such as
+    extremumSlip,extremumValue, asymptoteSlip, asymptoteValue and stiffness). We change this values to
+    make the car to start drifting.
+    */
+    WheelFrictionCurve FLwheelFriction;
       float FLWextremumSlip;
       WheelFrictionCurve FRwheelFriction;
       float FRWextremumSlip;
@@ -157,6 +160,7 @@ public class PrometeoCarController : MonoBehaviour
       float RLWextremumSlip;
       WheelFrictionCurve RRwheelFriction;
       float RRWextremumSlip;
+      public bool canMove;
 
     // Start is called before the first frame update
     void Start()
@@ -166,6 +170,7 @@ public class PrometeoCarController : MonoBehaviour
       //in the inspector.
       carRigidbody = gameObject.GetComponent<Rigidbody>();
       carRigidbody.centerOfMass = bodyMassCenter;
+      carLights = GetComponent<CarLights>();
 
       //Initial setup to calculate the drift value of the car. This part could look a bit
       //complicated, but do not be afraid, the only thing we're doing here is to save the default
@@ -287,6 +292,10 @@ public class PrometeoCarController : MonoBehaviour
       In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
       A (turn left), D (turn right) or Space bar (handbrake).
       */
+      if(!canMove)
+        {
+            ThrottleOff();
+        }
       if (useTouchControls && touchControlsSetup){
 
         if(throttlePTI.buttonPressed){
@@ -368,7 +377,28 @@ public class PrometeoCarController : MonoBehaviour
 
       // We call the method AnimateWheelMeshes() in order to match the wheel collider movements with the 3D meshes of the wheels.
       AnimateWheelMeshes();
+      CarLightsControl();
+    }
 
+    void CarLightsControl() // controlling lights, through the specific script "CarSounds".
+    {
+        if (Input.GetKey(KeyCode.Space)) // the red lights are activated when the brake is pressed
+        {
+            carLights.RearRedLightsOn();
+        }
+        else
+        {
+            carLights.RearRedLightsOff();
+        }
+
+        if (Input.GetKey(KeyCode.S)) // the rear white lights are activated when the player is pressing "S" or down arrow.
+        {
+            carLights.RearWhiteLightsOn();
+        }
+        else
+        {
+            carLights.RearWhiteLightsOff();
+        }
     }
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.
@@ -400,6 +430,7 @@ public class PrometeoCarController : MonoBehaviour
           if((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f)){
             if(!tireScreechSound.isPlaying){
               tireScreechSound.Play();
+              tireScreechSound.GetComponent<AudioSource>().volume = 1;
             }
           }else if((!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f)){
             tireScreechSound.Stop();

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class CarStats
@@ -17,8 +17,12 @@ public class CarStats
 public class GarageManager : MonoBehaviour
 {
     [Header("Car Settings")]
-    public List<GameObject> carPrefabs; // All car models (including different colors)
-    private int currentCarIndex = 0; // Tracks the currently active car
+    public List<GameObject> carPrefabs; // Prefabs for all cars (including different colors)
+    private int currentCarIndex = 0; // Tracks the currently selected car
+    private GameObject currentCarInstance; // The instantiated car in the garage
+
+    [Header("Spawn Settings")]
+    public Transform carSpawnPoint; // Position and rotation for spawning the car
 
     [Header("Car Stats")]
     public List<CarStats> carStats; // List of stats for each car
@@ -34,14 +38,20 @@ public class GarageManager : MonoBehaviour
 
     private void InitializeCar()
     {
-        // Deactivate all cars
-        foreach (GameObject car in carPrefabs)
+        // Destroy the previous car instance if it exists
+        if (currentCarInstance != null)
         {
-            car.SetActive(false);
+            currentCarInstance.SetActive(false);
+            Destroy(currentCarInstance);
         }
 
-        // Activate the selected car
-        carPrefabs[currentCarIndex].SetActive(true);
+        // Instantiate the selected car prefab at the spawn point
+        currentCarInstance = Instantiate(
+            carPrefabs[currentCarIndex],
+            carSpawnPoint.position,
+            carSpawnPoint.rotation
+        );
+        currentCarInstance.SetActive(true);
 
         // Update UI
         UpdateUI();
@@ -50,9 +60,9 @@ public class GarageManager : MonoBehaviour
     public void SwitchCar(int direction)
     {
         // Update the index
-        currentCarIndex = (currentCarIndex + direction%12 + carPrefabs.Count) % carPrefabs.Count;
+        currentCarIndex = (currentCarIndex + direction + carPrefabs.Count) % carPrefabs.Count;
 
-        // Activate the new car
+        // Instantiate the new car
         InitializeCar();
     }
 
@@ -90,7 +100,8 @@ public class GarageManager : MonoBehaviour
     public void ConfirmSelection()
     {
         GameObject selectedCar = carPrefabs[currentCarIndex];
-        GameManager.Instance.SetSelectedCar(selectedCar);
+        //GameManager.Instance.SetSelectedCar(selectedCar);
+        GameManager.Instance.selectedCarIndex = currentCarIndex;
         Debug.Log($"Selected Car: {selectedCar.name}");
         GameManager.Instance.LoadScene("Racing"); // Load the race scene
     }
