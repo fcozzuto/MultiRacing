@@ -1,32 +1,102 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton instance
 
-    [Header("Player Settings")]
-    public int humanPlayerCount = 1; // Number of human players
-    public GameObject selectedCarPrefab; // Player's chosen car prefab
-    public List<GameObject> availableCars; // List of all available car prefabs
-    public List<Transform> spawnPoints; // Spawn points in the racing scene
+    [Header("Car Settings")]
+    public List<GameObject> carPrefabs; // List of all car prefabs
+    public int selectedCarIndex = -1; // Index of the player's chosen car (-1 for Quick Start)
+    public int humanPlayerCount = 1; // Number of human players (future multiplayer support)
+
+    [Header("Scene Settings")]
+    public List<Transform> spawnPoints; // Spawn points for cars
+    public Transform[] waypoints; // Waypoints for AI cars
+    public GameObject mainMenuCanvas; // Main Menu Canvas in the Racing scene
+    public GameObject guiCanvas; // GUI Canvas (for ranking, lap time, etc.)
+    public TMP_Text countdownText; // Text element for the countdown (centered in GUI Canvas)
+    public Camera mainCamera; // Main Camera in the Racing scene
 
     [Header("Race Settings")]
-    public List<string> rankings; // Rankings of all players (human and AI)
-    public bool musicEnabled = true; // Toggle for music
+    public List<GameObject> allCars; // List of spawned cars
+    public bool raceStarted = false;
 
     private void Awake()
     {
-        // Ensure the GameManager persists across scenes
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to the sceneLoaded event
         }
         else
         {
-            Destroy(gameObject); // Enforce the singleton pattern
+            Destroy(gameObject); // Enforce singleton
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; // Unsubscribe from the event
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (selectedCarIndex == -1)
+        {
+            HandleRacingSceneLoad();
+        }
+    }
+
+    private void Start()
+    {
+        if (SceneManager.GetActiveScene().name == "Racing")
+        {
+            HandleRacingSceneLoad();
+        }
+    }
+
+    private void HandleRacingSceneLoad()
+    {
+        if (selectedCarIndex == -1)
+        {
+            // If no car has been selected yet, show the MainMenuCanvas
+            mainMenuCanvas.SetActive(true);
+            guiCanvas.SetActive(false);
+        }
+        else
+        {
+            // If returning from the Garage scene, set up the race directly
+            mainMenuCanvas.SetActive(false);
+            guiCanvas.SetActive(true);
+            ReassignSpawnPoints();
+            ReassignWaypoints();
+            SetupRaceScene();
+        }
+    }
+
+    private void ReassignSpawnPoints()
+    {
+        // Find all spawn points in the Racing scene by tag
+        spawnPoints = new List<Transform>();
+        GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        foreach (GameObject spawnPointObject in spawnPointObjects)
+        {
+            spawnPoints.Add(spawnPointObject.transform);
+        }
+    }
+
+    private void ReassignWaypoints()
+    {
+        GameObject[] waypointObjects = GameObject.FindGameObjectsWithTag("Waypoint");
+        waypoints = new Transform[waypointObjects.Length];
+        for (int i = 0; i < waypointObjects.Length; i++)
+        {
+            waypoints[i] = waypointObjects[i].transform;
         }
     }
 
@@ -35,38 +105,127 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    public void SetSelectedCar(GameObject carPrefab)
+    public void QuickStart()
     {
-        selectedCarPrefab = carPrefab;
+        // Select a random car for the player
+        selectedCarIndex = Random.Range(0, carPrefabs.Count);
+
+        // Hide the Main Menu and set up the race
+        mainMenuCanvas.SetActive(false);
+        guiCanvas.SetActive(true);
+        SetupRaceScene();
     }
 
-    public GameObject GetRandomAvailableCar()
+    public void SetupRaceScene()
     {
-        if (availableCars.Count > 0)
+        if (mainCamera) mainCamera.enabled = false;
+
+        // Spawn all cars
+        SpawnCars();
+
+        // Start the countdown
+        StartCoroutine(StartCountdown());
+    }
+
+    private void SpawnCars()
+    {
+        List<Transform> availableSpawnPoints = new List<Transform>(spawnPoints);
+        allCars = new List<GameObject>();
+
+        // Spawn human players
+        for (int i = 0; i < humanPlayerCount; i++)
         {
-            int randomIndex = Random.Range(0, availableCars.Count);
-            return availableCars[randomIndex];
-        }
-        return null;
-    }
+            int spawnIndex = Random.Range(0, availableSpawnPoints.Count);
+            Transform spawnPoint = availableSpawnPoints[spawnIndex];
+            availableSpawnPoints.RemoveAt(spawnIndex);
 
-    public Transform GetRandomSpawnPoint()
-    {
-        if (spawnPoints.Count > 0)
+            // Determine the car to spawn
+            GameObject carPrefab = (i == 0 && selectedCarIndex >= 0)
+                ? carPrefabs[selectedCarIndex]
+                : GetRandomCarPrefab();
+
+            GameObject carInstance = Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
+            carInstance.SetActive(true); // Ensure the car prefab is active
+            allCars.Add(carInstance);
+
+            // Set up player-specific components
+            SetupPlayerCar(carInstance);
+        }
+
+        // Spawn AI cars
+        foreach (Transform spawnPoint in availableSpawnPoints)
         {
-            int randomIndex = Random.Range(0, spawnPoints.Count);
-            return spawnPoints[randomIndex];
+            GameObject carPrefab = GetRandomCarPrefab();
+            GameObject carInstance = Instantiate(carPrefab, spawnPoint.position, spawnPoint.rotation);
+            carInstance.SetActive(true); // Ensure the car prefab is active
+            allCars.Add(carInstance);
+
+            // Set up AI-specific components
+            SetupAICar(carInstance);
         }
-        return null;
     }
 
-    public void AddToRankings(string playerName)
+    private GameObject GetRandomCarPrefab()
     {
-        rankings.Add(playerName);
+        return carPrefabs[Random.Range(0, carPrefabs.Count)];
     }
 
-    public void ClearRankings()
+    private void SetupPlayerCar(GameObject car)
     {
-        rankings.Clear();
+        car.transform.Find("PlayerCamera").gameObject.SetActive(true);
+        car.transform.Find("PlayerVirtualCamera").gameObject.SetActive(true);
+
+        var prometeoController = car.GetComponent<PrometeoCarController>();
+        if (prometeoController) prometeoController.enabled = true;
+
+        var aiController = car.GetComponent<AICarController>();
+        if (aiController) aiController.enabled = false;
+    }
+
+    private void SetupAICar(GameObject car)
+    {
+        car.transform.Find("PlayerCamera").gameObject.SetActive(false);
+        car.transform.Find("PlayerVirtualCamera").gameObject.SetActive(false);
+
+        var prometeoController = car.GetComponent<PrometeoCarController>();
+        if (prometeoController) prometeoController.enabled = false;
+
+        var aiController = car.GetComponent<AICarController>();
+        if (aiController) aiController.enabled = true;
+        aiController.waypoints = waypoints; // Assign waypoints to the AI car
+    }
+
+    private IEnumerator StartCountdown()
+    {
+        string[] countdownTexts = { "3", "2", "1", "GO!" };
+
+        // Freeze all cars (both player and AI)
+        foreach (GameObject car in allCars)
+        {
+            var prometeoController = car.GetComponent<PrometeoCarController>();
+            if (prometeoController) prometeoController.canMove = false;
+
+            var aiController = car.GetComponent<AICarController>();
+            if (aiController) aiController.enabled = false; // AI doesn't act during the countdown
+        }
+
+        for (int i = 0; i < countdownTexts.Length; i++)
+        {
+            countdownText.text = countdownTexts[i];
+            yield return new WaitForSeconds(1f);
+        }
+
+        // Unfreeze all cars
+        foreach (GameObject car in allCars)
+        {
+            var prometeoController = car.GetComponent<PrometeoCarController>();
+            if (prometeoController) prometeoController.canMove = true;
+
+            var aiController = car.GetComponent<AICarController>();
+            if (aiController) aiController.enabled = true; // Enable AI after countdown
+        }
+
+        countdownText.text = ""; // Clear countdown text after "GO!"
+        raceStarted = true;
     }
 }
