@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
     [Header("Scene Settings")]
     public List<Transform> spawnPoints; // Spawn points for cars
     public Transform[] waypoints; // Waypoints for AI cars
-    public GameObject mainMenuCanvas; // Main Menu Canvas in the Racing scene
     public GameObject guiCanvas; // GUI Canvas (for ranking, lap time, etc.)
     public TMP_Text countdownText; // Text element for the countdown (centered in GUI Canvas)
     public Camera mainCamera; // Main Camera in the Racing scene
@@ -65,13 +64,11 @@ public class GameManager : MonoBehaviour
         if (selectedCarIndex == -1)
         {
             // If no car has been selected yet, show the MainMenuCanvas
-            mainMenuCanvas.SetActive(true);
             guiCanvas.SetActive(false);
         }
         else
         {
             // If returning from the Garage scene, set up the race directly
-            mainMenuCanvas.SetActive(false);
             guiCanvas.SetActive(true);
             ReassignSpawnPoints();
             ReassignWaypoints();
@@ -111,7 +108,6 @@ public class GameManager : MonoBehaviour
         selectedCarIndex = Random.Range(0, carPrefabs.Count);
 
         // Hide the Main Menu and set up the race
-        mainMenuCanvas.SetActive(false);
         guiCanvas.SetActive(true);
         SetupRaceScene();
     }
@@ -177,9 +173,6 @@ public class GameManager : MonoBehaviour
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = true;
-
-        var aiController = car.GetComponent<AICarController>();
-        if (aiController) aiController.enabled = false;
     }
 
     private void SetupAICar(GameObject car)
@@ -190,9 +183,6 @@ public class GameManager : MonoBehaviour
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = false;
 
-        var aiController = car.GetComponent<AICarController>();
-        if (aiController) aiController.enabled = true;
-        aiController.waypoints = waypoints; // Assign waypoints to the AI car
     }
 
     private IEnumerator StartCountdown()
@@ -204,9 +194,6 @@ public class GameManager : MonoBehaviour
         {
             var prometeoController = car.GetComponent<PrometeoCarController>();
             if (prometeoController) prometeoController.canMove = false;
-
-            var aiController = car.GetComponent<AICarController>();
-            if (aiController) aiController.enabled = false; // AI doesn't act during the countdown
         }
 
         for (int i = 0; i < countdownTexts.Length; i++)
@@ -221,8 +208,6 @@ public class GameManager : MonoBehaviour
             var prometeoController = car.GetComponent<PrometeoCarController>();
             if (prometeoController) prometeoController.canMove = true;
 
-            var aiController = car.GetComponent<AICarController>();
-            if (aiController) aiController.enabled = true; // Enable AI after countdown
         }
 
         countdownText.text = ""; // Clear countdown text after "GO!"
