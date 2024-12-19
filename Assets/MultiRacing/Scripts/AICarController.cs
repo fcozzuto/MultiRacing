@@ -3,12 +3,12 @@ using UnityEngine;
 public class AICarController : MonoBehaviour
 {
     public Transform[] waypoints;    // List of waypoints for the AI to follow
-    public float maxSpeed = 15f;     // Max speed of the AI car
-    public float acceleration = 5f; // Acceleration rate
+    public float maxSpeed = 10f;     // Max speed of the AI car
+    public float acceleration = 1f; // Acceleration rate
     public float braking = 10f;     // Braking rate
-    public float turnSpeed = 2f;    // Steering speed
+    public float turnSpeed = 1f;    // Steering speed
     public float distanceThreshold = 2f;  // Distance threshold to the next waypoint
-    public float lookAheadDistance = 10f; // Distance to anticipate waypoints
+    public float lookAheadDistance = 50f; // Distance to anticipate waypoints
 
     private int currentWaypointIndex = 0;
     private Rigidbody rb;

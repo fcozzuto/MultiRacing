@@ -97,12 +97,33 @@ public class GarageManager : MonoBehaviour
         statSliders[4].value = stats.braking;
     }
 
-    public void ConfirmSelection()
+/*    public void ConfirmSelection()
     {
         GameObject selectedCar = carPrefabs[currentCarIndex];
         //GameManager.Instance.SetSelectedCar(selectedCar);
-        GameManager.Instance.selectedCarIndex = currentCarIndex;
+        //GameManager.Instance.selectedCarIndex = currentCarIndex;
+        StaticData.ChosenCarIndex = currentCarIndex;
         Debug.Log($"Selected Car: {selectedCar.name}");
+        //GameManager.Instance.StartRace();
         GameManager.Instance.LoadScene("Racing"); // Load the race scene
+    }
+*/
+    public void ConfirmSelection()
+    {
+        GameObject selectedCar = carPrefabs[currentCarIndex];
+        StaticData.ChosenCarIndex = currentCarIndex;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.selectedCarIndex = currentCarIndex;
+            Debug.Log($"Selected Car: {selectedCar.name}");
+        }
+        else
+        {
+            Debug.LogError("GameManager instance is null!");
+        }
+
+        // Load Racing scene
+        GameManager.Instance.LoadScene("Racing");
     }
 }

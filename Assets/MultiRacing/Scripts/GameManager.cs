@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -31,13 +32,15 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to the sceneLoaded event
+            Debug.Log($"GameManager created. Instance ID: {GetInstanceID()}");
         }
-        else
+        else if (Instance != this)
         {
-            Destroy(gameObject); // Enforce singleton
+            Debug.Log($"Duplicate GameManager detected. Destroying duplicate with ID: {GetInstanceID()}");
+            Destroy(gameObject);
         }
     }
+
 
     private void OnDestroy()
     {
@@ -46,9 +49,20 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (selectedCarIndex == -1)
+        if (scene.name == "Racing")
         {
-            HandleRacingSceneLoad();
+            Debug.Log($"Returning to Racing: SpawnPoints={StaticData.SpawnPoints.Count}, Waypoints={StaticData.Waypoints?.Length}");
+
+            // Start the race logic if a car is selected
+            if (selectedCarIndex != -1)
+            {
+                Debug.Log("Car selected, setting up race scene.");
+                HandleRacingSceneLoad();
+            }
+            else
+            {
+                Debug.Log("No car selected, showing Main Menu.");
+            }
         }
     }
 
@@ -58,46 +72,85 @@ public class GameManager : MonoBehaviour
         {
             HandleRacingSceneLoad();
         }
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void HandleRacingSceneLoad()
     {
+        if (mainMenuCanvas == null)
+        {
+            mainMenuCanvas = GameObject.Find("MainMenuCanvas");
+        }
+        if (guiCanvas == null)
+        {
+            guiCanvas = GameObject.Find("GUICanvas");
+            if (countdownText == null)
+            {
+                foreach (var textObj in guiCanvas.GetComponentsInChildren<TextMeshProUGUI>(true).Where(textObj => textObj.name == "GuideText"))
+                {
+                    countdownText = textObj;
+                }
+            }
+        }
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
         if (selectedCarIndex == -1)
         {
-            // If no car has been selected yet, show the MainMenuCanvas
             mainMenuCanvas.SetActive(true);
             guiCanvas.SetActive(false);
+            Debug.Log("Showing Main Menu Canvas.");
         }
         else
         {
-            // If returning from the Garage scene, set up the race directly
             mainMenuCanvas.SetActive(false);
             guiCanvas.SetActive(true);
             ReassignSpawnPoints();
             ReassignWaypoints();
+            Debug.Log("Setting up the race scene.");
             SetupRaceScene();
         }
     }
 
     private void ReassignSpawnPoints()
     {
-        // Find all spawn points in the Racing scene by tag
-        spawnPoints = new List<Transform>();
-        GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
-        foreach (GameObject spawnPointObject in spawnPointObjects)
+        if (StaticData.SpawnPoints != null && StaticData.SpawnPoints.Count > 0)
         {
-            spawnPoints.Add(spawnPointObject.transform);
+            spawnPoints = new List<Transform>(StaticData.SpawnPoints);
+            Debug.Log("Restored spawn points from StaticData.");
+            return;
         }
+
+        GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        spawnPoints = spawnPointObjects
+            .OrderBy(spawnPoint => spawnPoint.name)
+            .Select(spawnPoint => spawnPoint.transform)
+            .ToList();
+
+        StaticData.SpawnPoints = spawnPoints; // Store persistently
+        Debug.Log($"Found and stored {spawnPoints.Count} spawn points in order: {string.Join(", ", spawnPoints.Select(p => p.name))}");
     }
 
     private void ReassignWaypoints()
     {
-        GameObject[] waypointObjects = GameObject.FindGameObjectsWithTag("Waypoint");
-        waypoints = new Transform[waypointObjects.Length];
-        for (int i = 0; i < waypointObjects.Length; i++)
+        if (StaticData.Waypoints != null && StaticData.Waypoints.Length > 0)
         {
-            waypoints[i] = waypointObjects[i].transform;
+            waypoints = StaticData.Waypoints;
+            Debug.Log("Restored waypoints from StaticData.");
+            return;
         }
+
+        GameObject[] waypointObjects = GameObject.FindGameObjectsWithTag("Waypoint");
+        waypoints = waypointObjects
+            .OrderBy(waypoint => int.Parse(System.Text.RegularExpressions.Regex.Match(waypoint.name, @"\d+").Value))
+            .Select(waypoint => waypoint.transform)
+            .ToArray();
+
+        StaticData.Waypoints = waypoints; // Store persistently
+        Debug.Log($"Found and stored {waypoints.Length} waypoints in order: {string.Join(", ", waypoints.Select(w => w.name))}");
     }
 
     public void LoadScene(string sceneName)
@@ -118,7 +171,15 @@ public class GameManager : MonoBehaviour
 
     public void SetupRaceScene()
     {
-        if (mainCamera) mainCamera.enabled = false;
+        if (mainCamera)
+        {
+            var audioListener = mainCamera.GetComponentInChildren<AudioListener>();
+            if (audioListener != null)
+            {
+                audioListener.enabled = false;
+            }
+            mainCamera.enabled = false;
+        }
 
         // Spawn all cars
         SpawnCars();
@@ -139,7 +200,6 @@ public class GameManager : MonoBehaviour
             Transform spawnPoint = availableSpawnPoints[spawnIndex];
             availableSpawnPoints.RemoveAt(spawnIndex);
 
-            // Determine the car to spawn
             GameObject carPrefab = (i == 0 && selectedCarIndex >= 0)
                 ? carPrefabs[selectedCarIndex]
                 : GetRandomCarPrefab();
@@ -148,8 +208,8 @@ public class GameManager : MonoBehaviour
             carInstance.SetActive(true); // Ensure the car prefab is active
             allCars.Add(carInstance);
 
-            // Set up player-specific components
             SetupPlayerCar(carInstance);
+            Debug.Log($"Spawned player car: {carPrefab.name} at {spawnPoint.position}");
         }
 
         // Spawn AI cars
@@ -160,8 +220,8 @@ public class GameManager : MonoBehaviour
             carInstance.SetActive(true); // Ensure the car prefab is active
             allCars.Add(carInstance);
 
-            // Set up AI-specific components
             SetupAICar(carInstance);
+            Debug.Log($"Spawned AI car: {carPrefab.name} at {spawnPoint.position}");
         }
     }
 
@@ -175,6 +235,12 @@ public class GameManager : MonoBehaviour
         car.transform.Find("PlayerCamera").gameObject.SetActive(true);
         car.transform.Find("PlayerVirtualCamera").gameObject.SetActive(true);
 
+        var audioListener = car.GetComponentInChildren<AudioListener>();
+        if (audioListener != null)
+        {
+            audioListener.enabled = true;
+        }
+
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = true;
 
@@ -187,12 +253,22 @@ public class GameManager : MonoBehaviour
         car.transform.Find("PlayerCamera").gameObject.SetActive(false);
         car.transform.Find("PlayerVirtualCamera").gameObject.SetActive(false);
 
+        var audioListener = car.GetComponentInChildren<AudioListener>();
+        if (audioListener != null)
+        {
+            audioListener.enabled = false;
+        }
+
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = false;
 
         var aiController = car.GetComponent<AICarController>();
-        if (aiController) aiController.enabled = true;
-        aiController.waypoints = waypoints; // Assign waypoints to the AI car
+        if (aiController)
+        {
+            aiController.enabled = true;
+            aiController.waypoints = waypoints; // Assign waypoints to the AI car
+            Debug.Log($"Assigned {waypoints.Length} waypoints to AI car: {car.name}");
+        }
     }
 
     private IEnumerator StartCountdown()
@@ -203,10 +279,18 @@ public class GameManager : MonoBehaviour
         foreach (GameObject car in allCars)
         {
             var prometeoController = car.GetComponent<PrometeoCarController>();
-            if (prometeoController) prometeoController.canMove = false;
+            if (prometeoController)
+            {
+                prometeoController.canMove = false; // Freeze
+                Debug.Log($"Froze player car: {car.name}");
+            }
 
             var aiController = car.GetComponent<AICarController>();
-            if (aiController) aiController.enabled = false; // AI doesn't act during the countdown
+            if (aiController)
+            {
+                aiController.enabled = false; // Freeze AI
+                Debug.Log($"Froze AI car: {car.name}");
+            }
         }
 
         for (int i = 0; i < countdownTexts.Length; i++)

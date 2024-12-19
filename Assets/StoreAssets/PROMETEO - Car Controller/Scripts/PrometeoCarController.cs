@@ -434,6 +434,7 @@ public class PrometeoCarController : MonoBehaviour
             }
           }else if((!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f)){
             tireScreechSound.Stop();
+            tireScreechSound.GetComponent<AudioSource>().volume = 0;
           }
         }catch(Exception ex){
           Debug.LogWarning(ex);
@@ -444,6 +445,7 @@ public class PrometeoCarController : MonoBehaviour
         }
         if(tireScreechSound != null && tireScreechSound.isPlaying){
           tireScreechSound.Stop();
+          tireScreechSound.GetComponent<AudioSource>().volume = 0;
         }
       }
 
