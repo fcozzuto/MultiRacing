@@ -17065,6 +17065,7 @@ GameObject:
   - component: {fileID: 5525693237086959396}
   - component: {fileID: 7427388430036327991}
   - component: {fileID: -7027499936724434505}
+  - component: {fileID: 4448436406780686599}
   m_Layer: 0
   m_Name: Mustang Blue
   m_TagString: Untagged
@@ -17413,6 +17414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWaypoint: {fileID: 0}
+  speedText: {fileID: 0}
   maxSpeed: 0
   maxReverseSpeed: 0
   accelerationMultiplier: 0
@@ -17427,8 +17429,30 @@ MonoBehaviour:
   rearLeftCollider: {fileID: 0}
   rearRightMesh: {fileID: 0}
   rearRightCollider: {fileID: 0}
+  antiRollForce: 20000
   engineSound: {fileID: 0}
   tireSound: {fileID: 0}
+--- !u!65 &4448436406780686599
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6755479631696634856}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &6761163725818105425
 GameObject:
   m_ObjectHideFlags: 0

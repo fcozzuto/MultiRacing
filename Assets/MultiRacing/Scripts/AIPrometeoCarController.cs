@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class AIPrometeoCarController : MonoBehaviour
 {
     public Transform currentWaypoint;
     private Rigidbody carRigidbody;
+    public TMP_Text speedText;
 
     // Copy fields from PrometeoCarController
     public int maxSpeed;
@@ -33,8 +36,6 @@ public class AIPrometeoCarController : MonoBehaviour
     private float enginePitch = 0f;
     private float steerAngle = 0f;
     private float curveSharpness = 0f;
-
-    private float lookAheadDistance = 10f; // Distance to look ahead for detecting sharp turns
 
     void Start()
     {
@@ -283,5 +284,10 @@ public class AIPrometeoCarController : MonoBehaviour
     public void SetNextWaypoint(Transform nextWaypoint)
     {
         currentWaypoint = nextWaypoint;
+    }
+
+    internal Transform GetLastValidWaypoint()
+    {
+        return currentWaypoint;
     }
 }

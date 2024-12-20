@@ -5,6 +5,7 @@ using TMPro;
 using System.Collections;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -245,6 +246,8 @@ public class GameManager : MonoBehaviour
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = true;
+        prometeoController.useUI = true;
+        prometeoController.carSpeedText = guiCanvas.transform.Find("Speed Text").GetComponent<Text>();
 
         var aiPrometeoController = car.GetComponent<AIPrometeoCarController>();
         if (aiPrometeoController) Destroy(aiPrometeoController);

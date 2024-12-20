@@ -11948,6 +11948,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 500796262462586196}
+    - targetCorrespondingSourceObject: {fileID: 3311311803080157842, guid: 133308cdb8794744caaef026bde9e1f0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -6063176559028699195}
   m_SourcePrefab: {fileID: 100100000, guid: 133308cdb8794744caaef026bde9e1f0, type: 3}
 --- !u!146 &203444777694689276 stripped
 WheelCollider:
@@ -12172,6 +12176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWaypoint: {fileID: 0}
+  speedText: {fileID: 0}
   maxSpeed: 0
   maxReverseSpeed: 0
   accelerationMultiplier: 0
@@ -12186,8 +12191,30 @@ MonoBehaviour:
   rearLeftCollider: {fileID: 0}
   rearRightMesh: {fileID: 0}
   rearRightCollider: {fileID: 0}
+  antiRollForce: 20000
   engineSound: {fileID: 0}
   tireSound: {fileID: 0}
+--- !u!65 &-6063176559028699195
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 324493317226680474}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!146 &920490549401354894 stripped
 WheelCollider:
   m_CorrespondingSourceObject: {fileID: 2716459193614891142, guid: 133308cdb8794744caaef026bde9e1f0,

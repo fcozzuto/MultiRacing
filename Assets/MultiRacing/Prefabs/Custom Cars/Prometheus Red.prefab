@@ -5410,6 +5410,7 @@ GameObject:
   - component: {fileID: 5240062791215855093}
   - component: {fileID: 7696847634164977983}
   - component: {fileID: 6826934016925518405}
+  - component: {fileID: 1667287898653044473}
   m_Layer: 0
   m_Name: Prometheus Red
   m_TagString: Untagged
@@ -5676,6 +5677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWaypoint: {fileID: 0}
+  speedText: {fileID: 0}
   maxSpeed: 0
   maxReverseSpeed: 0
   accelerationMultiplier: 0
@@ -5690,8 +5692,30 @@ MonoBehaviour:
   rearLeftCollider: {fileID: 0}
   rearRightMesh: {fileID: 0}
   rearRightCollider: {fileID: 0}
+  antiRollForce: 20000
   engineSound: {fileID: 0}
   tireSound: {fileID: 0}
+--- !u!65 &1667287898653044473
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937941311645303246}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2035120811901375248
 GameObject:
   m_ObjectHideFlags: 0
