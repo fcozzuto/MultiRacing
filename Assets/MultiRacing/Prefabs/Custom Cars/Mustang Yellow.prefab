@@ -636,6 +636,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3716176741649017311}
+    - targetCorrespondingSourceObject: {fileID: 1296956597419113522, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3302638895454495463}
+    - targetCorrespondingSourceObject: {fileID: 1296956597419113522, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5865822725539402701}
   m_SourcePrefab: {fileID: 100100000, guid: 9d67538aec7ae3f4da9f138ee48fae0a, type: 3}
 --- !u!1 &1548578044009756440 stripped
 GameObject:
@@ -681,6 +689,57 @@ MonoBehaviour:
   brakeForce: 0
   maxSteeringAngle: 0
   steeringSpeed: 0
+  frontLeftMesh: {fileID: 0}
+  frontLeftCollider: {fileID: 0}
+  frontRightMesh: {fileID: 0}
+  frontRightCollider: {fileID: 0}
+  rearLeftMesh: {fileID: 0}
+  rearLeftCollider: {fileID: 0}
+  rearRightMesh: {fileID: 0}
+  rearRightCollider: {fileID: 0}
+  antiRollForce: 20000
+  engineSound: {fileID: 0}
+  tireSound: {fileID: 0}
+--- !u!195 &3302638895454495463
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548578044009756440}
+  m_Enabled: 1
+  m_AgentTypeID: -1372625422
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 5
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 0
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &5865822725539402701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548578044009756440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 586c007f3a52f7a4f8f091d53ba5be12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  waypoints: []
+  maxSpeed: 0
+  accelerationMultiplier: 0
+  brakeForce: 0
+  maxSteeringAngle: 0
   frontLeftMesh: {fileID: 0}
   frontLeftCollider: {fileID: 0}
   frontRightMesh: {fileID: 0}

@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using System.Linq;
-using Unity.VisualScripting;
+using UnityEngine.AI;
 
 public class GameManager : MonoBehaviour
 {
@@ -248,6 +248,13 @@ public class GameManager : MonoBehaviour
 
         var aiPrometeoController = car.GetComponent<AIPrometeoCarController>();
         if (aiPrometeoController) Destroy(aiPrometeoController);
+
+        var navMeshController = car.GetComponent<NavMeshAICarController>();
+        if (navMeshController) Destroy(navMeshController);
+
+        var agent = car.GetComponent<NavMeshAgent>();
+        if (agent != null) agent.enabled = false;
+
         playerCars.Add(car);
     }
 
@@ -264,29 +271,36 @@ public class GameManager : MonoBehaviour
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
         var aiController = car.GetComponent<AIPrometeoCarController>();
+        if (aiController) Destroy(aiController);
 
-        if (aiController && prometeoController)
+        var navMeshController = car.GetComponent<NavMeshAICarController>();
+        if (navMeshController) navMeshController.enabled = true;
+        var agent = car.GetComponent<NavMeshAgent>();
+        if (agent != null) agent.enabled = true;
+
+        if (navMeshController && prometeoController)
         {
             // Transfer core stats
-            aiController.maxSpeed = prometeoController.maxSpeed;
-            aiController.maxReverseSpeed = prometeoController.maxReverseSpeed;
-            aiController.accelerationMultiplier = prometeoController.accelerationMultiplier;
-            aiController.brakeForce = prometeoController.brakeForce;
-            aiController.maxSteeringAngle = prometeoController.maxSteeringAngle;
-            aiController.steeringSpeed = prometeoController.steeringSpeed;
+            navMeshController.maxSpeed = prometeoController.maxSpeed;
+            //navMeshController.maxReverseSpeed = prometeoController.maxReverseSpeed;
+            navMeshController.accelerationMultiplier = prometeoController.accelerationMultiplier;
+            navMeshController.brakeForce = prometeoController.brakeForce;
+            navMeshController.maxSteeringAngle = prometeoController.maxSteeringAngle;
+            //navMeshController.steeringSpeed = prometeoController.steeringSpeed;
 
-            aiController.frontLeftMesh = prometeoController.frontLeftMesh;
-            aiController.frontLeftCollider = prometeoController.frontLeftCollider;
-            aiController.frontRightMesh = prometeoController.frontRightMesh;
-            aiController.frontRightCollider = prometeoController.frontRightCollider;
-            aiController.rearLeftMesh = prometeoController.rearLeftMesh;
-            aiController.rearLeftCollider = prometeoController.rearLeftCollider;
-            aiController.rearRightMesh = prometeoController.rearRightMesh;
-            aiController.rearRightCollider = prometeoController.rearRightCollider;
-            aiController.engineSound = prometeoController.carEngineSound;
-            aiController.tireSound = prometeoController.tireScreechSound;
+            navMeshController.frontLeftMesh = prometeoController.frontLeftMesh;
+            navMeshController.frontLeftCollider = prometeoController.frontLeftCollider;
+            navMeshController.frontRightMesh = prometeoController.frontRightMesh;
+            navMeshController.frontRightCollider = prometeoController.frontRightCollider;
+            navMeshController.rearLeftMesh = prometeoController.rearLeftMesh;
+            navMeshController.rearLeftCollider = prometeoController.rearLeftCollider;
+            navMeshController.rearRightMesh = prometeoController.rearRightMesh;
+            navMeshController.rearRightCollider = prometeoController.rearRightCollider;
+            navMeshController.engineSound = prometeoController.carEngineSound;
+            navMeshController.tireSound = prometeoController.tireScreechSound;
 
-            aiController.currentWaypoint = waypoints[0];
+            //navMeshController.currentWaypoint = waypoints[0];
+            navMeshController.waypoints = waypoints;
         }
 
         if (prometeoController)
@@ -309,8 +323,10 @@ public class GameManager : MonoBehaviour
 
         foreach (GameObject AICar in AICars)
         {
-            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
-            aIPrometeoCarController.enabled = false;
+            var aIPrometeoCarController = AICar.GetComponent<NavMeshAICarController>();
+            aIPrometeoCarController.enabled = false; 
+            var agent = AICar.GetComponent<NavMeshAgent>();
+            if (agent != null) agent.enabled = false;
         }
 
         for (int i = 0; i < countdownTexts.Length; i++)
@@ -328,8 +344,10 @@ public class GameManager : MonoBehaviour
 
         foreach (GameObject AICar in AICars)
         {
-            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
+            var aIPrometeoCarController = AICar.GetComponent<NavMeshAICarController>();
             aIPrometeoCarController.enabled = true;
+            var agent = AICar.GetComponent<NavMeshAgent>();
+            if (agent != null) agent.enabled = true;
         }
 
         countdownText.text = ""; // Clear countdown text after "GO!"
