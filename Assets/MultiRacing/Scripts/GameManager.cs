@@ -251,6 +251,7 @@ public class GameManager : MonoBehaviour
 
         var aiPrometeoController = car.GetComponent<AIPrometeoCarController>();
         if (aiPrometeoController) Destroy(aiPrometeoController);
+        car.tag = "Player";
         playerCars.Add(car);
     }
 

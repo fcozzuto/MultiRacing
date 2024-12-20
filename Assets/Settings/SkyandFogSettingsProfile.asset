@@ -415,10 +415,10 @@ MonoBehaviour:
     m_Value: {fileID: 8900000, guid: 5a672cb61ef32734b9c28539c9c42494, type: 2}
   spaceEmissionMultiplier:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.023704171
   spaceRotation:
     m_OverrideState: 1
-    m_Value: {x: 348.56436, y: 189.77242, z: 49.01916}
+    m_Value: {x: 2.8718243, y: 177.58752, z: 49.939518}
   colorSaturation:
     m_OverrideState: 1
     m_Value: 1
