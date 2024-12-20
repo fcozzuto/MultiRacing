@@ -517,7 +517,17 @@ PrefabInstance:
     - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
       propertyPath: m_Volume
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3008969451505158928, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
@@ -611,8 +621,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
+      propertyPath: MaxDistance
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
