@@ -6,6 +6,7 @@ using System.Collections;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     [Header("Race Settings")]
     public List<GameObject> allCars; // List of spawned cars
     public bool raceStarted = false;
+    public bool raceFinished = false;
 
     private void Awake()
     {
@@ -298,6 +300,7 @@ public class GameManager : MonoBehaviour
             prometeoController.enabled = false; // Disable player control for AI cars
             Destroy(prometeoController);
         }
+        car.tag = "AI";
         AICars.Add(car);
     }
 

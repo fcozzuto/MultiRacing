@@ -51,6 +51,8 @@ public class GarageManager : MonoBehaviour
             carSpawnPoint.position,
             carSpawnPoint.rotation
         );
+        currentCarInstance.GetComponent<AIPrometeoCarController>().enabled = false;
+        currentCarInstance.GetComponent<PrometeoCarController>().enabled = false;
         currentCarInstance.SetActive(true);
 
         // Update UI
