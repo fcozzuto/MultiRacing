@@ -146,6 +146,7 @@ public class PrometeoCarController : MonoBehaviour
       bool deceleratingCar;
       bool touchControlsSetup = false;
       private CarLights carLights;
+      private RaceManager raceManager;
 
     /*
     The following variables are used to store information about sideways friction of the wheels (such as
@@ -165,6 +166,7 @@ public class PrometeoCarController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+      raceManager = GetComponent<RaceManager>();
       //In this part, we set the 'carRigidbody' value with the Rigidbody attached to this
       //gameObject. Also, we define the center of mass of the car with the Vector3 given
       //in the inspector.
@@ -334,9 +336,10 @@ public class PrometeoCarController : MonoBehaviour
           ResetSteeringAngle();
         }
 
-      }else{
+      }else if (raceManager.raceStarted == true)
+        {
 
-        if(Input.GetKey(KeyCode.W)){
+       if(Input.GetKey(KeyCode.W)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
           GoForward();

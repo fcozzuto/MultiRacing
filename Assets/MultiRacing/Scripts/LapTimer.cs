@@ -1,9 +1,10 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LapTimer : MonoBehaviour
 {
-    public Text lapTimeText;  // UI Text element to display time
+    public TMP_Text lapTimeText;  // UI Text element to display time
     public Transform startLine;  // Starting line to trigger lap
     private bool isLapStarted = false;
     private float lapTime = 0f;
@@ -18,9 +19,9 @@ public class LapTimer : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             if (!isLapStarted)
             {

@@ -1,26 +1,28 @@
 using UnityEngine;
+using Unity.Netcode;
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Cinemachine;
 
 namespace PolyStang
 {
-    public class CarController : MonoBehaviour
+    public class CarController : NetworkBehaviour
     {
-        public enum ControlMode // this car controller works for both pc and touch devices. You can switch the control mode from the inspector.
+        public enum ControlMode
         {
             Keyboard,
             Buttons
         };
 
-        public enum Axel // used to identify front and rear wheels.
+        public enum Axel
         {
             Front,
             Rear
         }
 
         [Serializable]
-        public struct Wheel // wheel bits: all fields must be filled to make the wheel work properly.
+        public struct Wheel
         {
             public GameObject wheelModel;
             public WheelCollider wheelCollider;
@@ -47,7 +49,7 @@ namespace PolyStang
 
         [Header("Speed UI")]
         public TMP_Text speedText;
-        public float UISpeedMultiplier = 4;
+        public float UISpeedMultiplier = 3.6f;
 
         [Header("Speed limit")]
         public float frontMaxSpeed = 200;
@@ -70,19 +72,19 @@ namespace PolyStang
 
         [Header("General")]
         public Vector3 _centerOfMass;
-
         public List<Wheel> wheels;
-
-        float moveInput;
-        float steerInput;
-
+        private float moveInput;
+        private float steerInput;
         private Rigidbody carRb;
-
         private CarLights carLights;
         private CarSounds carSounds;
+        private RaceManager raceManager;
 
-        void Start() // called the first frame, when the game starts.
+        internal bool canMove;
+
+        private void Start()
         {
+            raceManager = GetComponent<RaceManager>();
             carRb = GetComponent<Rigidbody>();
             carRb.centerOfMass = _centerOfMass;
 
@@ -90,33 +92,63 @@ namespace PolyStang
             carSounds = GetComponent<CarSounds>();
         }
 
-        void Update() // called every frame.
+        private void Update()
         {
-            GetInputs();
+            if (!IsOwner) return; // Only allow the owner to control the car
+            if (raceManager.raceStarted == true)
+            {
+                GetInputs();
+                UpdateSpeedUI();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (!IsOwner) return; // Owner-only actions
             AnimateWheels();
             WheelEffectsCheck();
             CarLightsControl();
+            if (raceManager.raceStarted == true)
+            {
+                SubmitInputsServerRpc(moveInput, steerInput);
+            }
         }
 
-        void LateUpdate() // called after the "Update()" function.
+        [ServerRpc]
+        private void SubmitInputsServerRpc(float move, float steer)
+        {
+            moveInput = move;
+            steerInput = steer;
+            ApplyMovement();
+        }
+
+        private void ApplyMovement()
         {
             Move();
             Steer();
             BrakeAndDeacceleration();
-            UpdateSpeedUI();
+            SyncVisualsClientRpc();
         }
 
-        public void MoveInput(float input) // used for touch controls.
+        [ClientRpc]
+        private void SyncVisualsClientRpc()
         {
+            AnimateWheels();
+        }
+
+        public void MoveInput(float input)
+        {
+            if (!IsOwner) return;
             moveInput = input;
         }
 
-        public void SteerInput(float input) // used for touch controls.
+        public void SteerInput(float input)
         {
+            if (!IsOwner) return;
             steerInput = input;
         }
 
-        void GetInputs() // inputs.
+        private void GetInputs()
         {
             if (control == ControlMode.Keyboard)
             {
@@ -125,103 +157,78 @@ namespace PolyStang
             }
         }
 
-        void Move() // main vertical acceleration.
+        private void Move()
         {
             foreach (var wheel in wheels)
             {
-                // rotational speed is proportional to radius * frequency: the empirical coefficient is around 0.41
                 float currentWheelSpeed = empiricalCoefficient * wheel.wheelCollider.radius * wheel.wheelCollider.rpm;
 
-                if (moveInput > 0 || currentWheelSpeed > 0) // when moving forwards
-                { 
-                    if(currentWheelSpeed > frontMaxSpeed) // important check: it prevents the car from accelerating indefinetly
-                    {
-                        currentWheelSpeed = frontMaxSpeed;
-                    }
-                    
-                    // cases: different speed reducing technics
-                    if (typeOfSpeedLimit == TypeOfSpeedLimit.noSpeedLimit)
-                    {
-                        frontSpeedReducer = 1;
-                    }
-                    else if (typeOfSpeedLimit == TypeOfSpeedLimit.simple)
-                    {
-                        frontSpeedReducer = (frontMaxSpeed - currentWheelSpeed ) / frontMaxSpeed;
-                    }
-                    else if (typeOfSpeedLimit == TypeOfSpeedLimit.squareRoot)
-                    {
-                        frontSpeedReducer = Mathf.Sqrt(Mathf.Abs((frontMaxSpeed - currentWheelSpeed) / frontMaxSpeed));
-                    }
-
-                    // applying reduction
+                if (moveInput > 0 || currentWheelSpeed > 0)
+                {
+                    ApplySpeedLimit(ref currentWheelSpeed, frontMaxSpeed, ref frontSpeedReducer);
                     wheel.wheelCollider.motorTorque = moveInput * 600 * maxAcceleration * frontSpeedReducer * Time.deltaTime;
                 }
-                else if (moveInput < 0 || currentWheelSpeed < 0) // when moving backwards
+                else if (moveInput < 0 || currentWheelSpeed < 0)
                 {
-                    if (currentWheelSpeed < - rearMaxSpeed) // important check: it prevents the car from accelerating indefinetly
-                    {
-                        currentWheelSpeed = - rearMaxSpeed;
-                    }
-
-                    // cases: different speed reducing technics
-                    if (typeOfSpeedLimit == TypeOfSpeedLimit.noSpeedLimit)
-                    {
-                        rearSpeedReducer = 1;
-                    }
-                    else if (typeOfSpeedLimit == TypeOfSpeedLimit.simple)
-                    {
-                        rearSpeedReducer = (rearMaxSpeed + currentWheelSpeed) / rearMaxSpeed;
-                    }
-                    else if (typeOfSpeedLimit == TypeOfSpeedLimit.squareRoot)
-                    {
-                        rearSpeedReducer = Mathf.Sqrt(Mathf.Abs((rearMaxSpeed + currentWheelSpeed) / rearMaxSpeed));
-                    }
-
-                    // applying reduction
+                    ApplySpeedLimit(ref currentWheelSpeed, -rearMaxSpeed, ref rearSpeedReducer);
                     wheel.wheelCollider.motorTorque = moveInput * 600 * maxAcceleration * rearSpeedReducer * Time.deltaTime;
                 }
             }
         }
 
-        void Steer() // to rotate the front wheels, when steering.
+        private void ApplySpeedLimit(ref float currentSpeed, float maxSpeed, ref float speedReducer)
+        {
+            if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxSpeed))
+            {
+                currentSpeed = maxSpeed;
+            }
+
+            switch (typeOfSpeedLimit)
+            {
+                case TypeOfSpeedLimit.noSpeedLimit:
+                    speedReducer = 1;
+                    break;
+                case TypeOfSpeedLimit.simple:
+                    speedReducer = Mathf.Abs((maxSpeed - currentSpeed) / maxSpeed);
+                    break;
+                case TypeOfSpeedLimit.squareRoot:
+                    speedReducer = Mathf.Sqrt(Mathf.Abs((maxSpeed - currentSpeed) / maxSpeed));
+                    break;
+            }
+        }
+
+        private void Steer()
         {
             foreach (var wheel in wheels)
             {
                 if (wheel.axel == Axel.Front)
                 {
-                    var _steerAngle = steerInput * turnSensitivity * maxSteerAngle;
-                    wheel.wheelCollider.steerAngle = Mathf.Lerp(wheel.wheelCollider.steerAngle, _steerAngle, 0.6f);
+                    float steerAngle = steerInput * turnSensitivity * maxSteerAngle;
+                    wheel.wheelCollider.steerAngle = Mathf.Lerp(wheel.wheelCollider.steerAngle, steerAngle, 0.6f);
                 }
             }
         }
 
-        void BrakeAndDeacceleration()
+        private void BrakeAndDeacceleration()
         {
-            if (Input.GetKey(brakeKey)) // when pressing space, the brake is used.
+            foreach (var wheel in wheels)
             {
-                foreach (var wheel in wheels)
+                if (Input.GetKey(brakeKey))
                 {
                     wheel.wheelCollider.brakeTorque = 300 * brakeAcceleration * Time.deltaTime;
                 }
-
-            }
-            else if (moveInput == 0) // with no vertical input, a slight deacceleration is used to slightly slow down the speed of the car.
-            {
-                foreach (var wheel in wheels)
+                else if (moveInput == 0)
                 {
                     wheel.wheelCollider.brakeTorque = 300 * noInputDeacceleration * Time.deltaTime;
                 }
-            }
-            else // with vertical input, no brake or deacceleration is applied.
-            {
-                foreach (var wheel in wheels)
+                else
                 {
                     wheel.wheelCollider.brakeTorque = 0;
                 }
             }
         }
 
-        void AnimateWheels() // to animate wheels accordingly to the car speed.
+        private void AnimateWheels()
         {
             foreach (var wheel in wheels)
             {
@@ -233,45 +240,44 @@ namespace PolyStang
             }
         }
 
-        void WheelEffectsCheck() // checking for every wheel if it's slipping: if yes, the "EffectCreate()" function is called.
+        private void WheelEffectsCheck()
         {
             foreach (var wheel in wheels)
             {
-                // slipping ---> skid
-                WheelHit GroundHit; // variable to store hit data
-                wheel.wheelCollider.GetGroundHit(out GroundHit); // store hit data into GroundHit
-                float lateralDrift = Mathf.Abs(GroundHit.sidewaysSlip);
+                WheelHit hit;
+                wheel.wheelCollider.GetGroundHit(out hit);
+                float lateralDrift = Mathf.Abs(hit.sidewaysSlip);
 
-                if (Input.GetKey(brakeKey) && wheel.axel == Axel.Rear && wheel.wheelCollider.isGrounded == true && carRb.velocity.magnitude >= brakeDriftingSkidLimit)
+                if (Input.GetKey(brakeKey) && wheel.axel == Axel.Rear && carRb.velocity.magnitude >= brakeDriftingSkidLimit)
                 {
                     EffectCreate(wheel);
                 }
-                else if (wheel.wheelCollider.isGrounded == true && wheel.axel == Axel.Front && (lateralDrift > lateralFrontDriftingSkidLimit)) // drifting: front wheels
+                else if (wheel.axel == Axel.Front && lateralDrift > lateralFrontDriftingSkidLimit)
                 {
                     EffectCreate(wheel);
                 }
-                else if (wheel.wheelCollider.isGrounded == true && wheel.axel == Axel.Rear && (lateralDrift > lateralRearDriftingSkidLimit)) // drifting: rear wheels
+                else if (wheel.axel == Axel.Rear && lateralDrift > lateralRearDriftingSkidLimit)
                 {
                     EffectCreate(wheel);
                 }
                 else
                 {
                     wheel.wheelEffectObj.GetComponentInChildren<TrailRenderer>().emitting = false;
-                    carSounds.StopSkidSound(wheel.skidSound, wheel.index); // actually decreasing the volume of the skid to 0: see the "CarSound" script.
+                    carSounds.StopSkidSound(wheel.skidSound, wheel.index);
                 }
             }
         }
 
-        private void EffectCreate(Wheel wheel) // actually creating the effects: 1) trail renderer for the skid, 2) smoke particles, 3) skid sound.
+        private void EffectCreate(Wheel wheel)
         {
             wheel.wheelEffectObj.GetComponentInChildren<TrailRenderer>().emitting = true;
             wheel.smokeParticle.Emit(1);
-            carSounds.PlaySkidSound(wheel.skidSound); // actually setting the volume of the skid to 1
+            carSounds.PlaySkidSound(wheel.skidSound);
         }
 
-        void CarLightsControl() // controlling lights, through the specific script "CarSounds".
+        private void CarLightsControl()
         {
-            if (Input.GetKey(brakeKey)) // the red lights are activated when the brake is pressed
+            if (Input.GetKey(brakeKey))
             {
                 carLights.RearRedLightsOn();
             }
@@ -280,7 +286,7 @@ namespace PolyStang
                 carLights.RearRedLightsOff();
             }
 
-            if (moveInput < 0f) // the rear white lights are activated when the player is pressing "S" or down arrow.
+            if (moveInput < 0f)
             {
                 carLights.RearWhiteLightsOn();
             }
@@ -290,8 +296,10 @@ namespace PolyStang
             }
         }
 
-        void UpdateSpeedUI() // UI: speed update.
+        private void UpdateSpeedUI()
         {
+            if (speedText == null) return;
+
             int roundedSpeed = (int)Mathf.Round(carRb.velocity.magnitude * UISpeedMultiplier);
             speedText.text = roundedSpeed.ToString();
         }

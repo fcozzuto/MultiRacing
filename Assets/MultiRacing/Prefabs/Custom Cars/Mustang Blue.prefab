@@ -17056,6 +17056,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8473904900518085752}
+  - component: {fileID: 5841712988066100550}
   - component: {fileID: 6920410112762373854}
   - component: {fileID: 6395678951801928250}
   - component: {fileID: 4774326336257773569}
@@ -17063,14 +17064,15 @@ GameObject:
   - component: {fileID: 5815240449245372335}
   - component: {fileID: 5211857167816095299}
   - component: {fileID: 5525693237086959396}
-  - component: {fileID: 7427388430036327991}
+  - component: {fileID: 6597375376208196691}
+  - component: {fileID: -577918071683184036}
   m_Layer: 0
   m_Name: Mustang Blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8473904900518085752
 Transform:
   m_ObjectHideFlags: 0
@@ -17100,6 +17102,27 @@ Transform:
   - {fileID: 8886533668735137514}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &5841712988066100550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6755479631696634856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1517395161
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &6920410112762373854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17158,6 +17181,9 @@ MonoBehaviour:
     axel: 1
     skidSound: {fileID: 0}
     index: 3
+  MyCamera: {fileID: 0}
+  MyCanvas: {fileID: 0}
+  MyVCamera: {fileID: 0}
 --- !u!114 &6395678951801928250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17381,7 +17407,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &7427388430036327991
+--- !u!114 &6597375376208196691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -17390,45 +17416,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 6755479631696634856}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9fc8e08a028fab44b4680510abd825e, type: 3}
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  maxSpeed: 50
-  turnSpeed: 2
-  distanceThreshold: 2
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &-577918071683184036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6755479631696634856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6761163725818105425
 GameObject:
   m_ObjectHideFlags: 0

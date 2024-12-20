@@ -1,0 +1,73 @@
+using UnityEngine;
+using Unity.Netcode;
+using System.Collections.Generic;
+using TMPro;
+using Cinemachine;
+
+public class TestScript : NetworkBehaviour
+{
+
+    private Dictionary<GameObject, int> finishOrder = new Dictionary<GameObject, int>(); // Tracks the finish order
+    private int carsFinished = 0; // Number of cars that have finished
+    private int totalCars; // Total number of cars in the race
+    private bool raceFinished = false; // Tracks if the race is completed
+
+    void start()
+    {
+        totalCars = FindObjectsOfType<CarController>().Length; // Adjust based on how cars are instantiated
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (raceFinished) return; // Exit if the race is already finished
+
+        var carController = other.GetComponent<CarController>();
+        if (carController != null && !finishOrder.ContainsKey(other.gameObject)) // Check if the object is a car and hasn't finished yet
+        {
+            carsFinished++;
+            finishOrder[other.gameObject] = carsFinished; // Assign finish position
+
+            Debug.Log($"{other.gameObject.name} finished in position {carsFinished}!");
+
+            // Optionally notify clients about the car's position
+            NotifyFinishClientRpc(other.gameObject.name, carsFinished);
+
+            // Check if all cars have finished
+            if (carsFinished == totalCars)
+            {
+                raceFinished = true;
+                EndRace();
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void NotifyFinishClientRpc(string carName, int position)
+    {
+        Debug.Log($"{carName} finished in position {position}");
+        // Optionally update a leaderboard UI here
+    }
+
+    private void EndRace()
+    {
+        Debug.Log("Race finished! Final Results:");
+        foreach (var car in finishOrder)
+        {
+            Debug.Log($"{car.Key.name} finished in position {car.Value}");
+        }
+
+        // Optionally notify clients with final results or display a leaderboard UI
+        DisplayResultsClientRpc(finishOrder);
+    }
+
+    [ClientRpc]
+    private void DisplayResultsClientRpc(Dictionary<GameObject, int> finalResults)
+    {
+        // Display the results to the player (e.g., update a UI leaderboard)
+        foreach (var result in finalResults)
+        {
+            Debug.Log($"Car: {result.Key.name}, Position: {result.Value}");
+        }
+    }
+
+}

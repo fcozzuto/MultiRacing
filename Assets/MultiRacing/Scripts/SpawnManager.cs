@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using PolyStang;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class SpawnManager : MonoBehaviour
     public List<Transform> spawnPoints = new List<Transform>();
 
     private List<Transform> usedSpawnPoints = new List<Transform>();
+
+    public GameObject playerPrefab;
 
     void Start()
     {
@@ -34,7 +37,7 @@ public class SpawnManager : MonoBehaviour
         {
             // Spawn the player at the chosen spawn point
             GameObject playerInstance = Instantiate(
-                NetworkManager.Singleton.NetworkConfig.PlayerPrefab,
+                playerPrefab,
                 freeSpawnPoint.position,
                 freeSpawnPoint.rotation
             );
@@ -43,6 +46,8 @@ public class SpawnManager : MonoBehaviour
 
             // Spawn the player object for the client
             playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
+
+            // Register the car with the RaceController
         }
         else
         {
@@ -62,4 +67,5 @@ public class SpawnManager : MonoBehaviour
 
         return null; // No free spawn point available
     }
+
 }
