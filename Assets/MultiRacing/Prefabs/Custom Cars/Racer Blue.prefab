@@ -1395,7 +1395,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f632e2ace80a32e47a2c531f64901a50, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -11944,6 +11944,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1888989517970643525}
+    - targetCorrespondingSourceObject: {fileID: 3311311803080157842, guid: 133308cdb8794744caaef026bde9e1f0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8315835254620516374}
   m_SourcePrefab: {fileID: 100100000, guid: 133308cdb8794744caaef026bde9e1f0, type: 3}
 --- !u!1 &645607810494544247 stripped
 GameObject:
@@ -12064,7 +12068,6 @@ MonoBehaviour:
   carSpeed: 0
   isDrifting: 0
   isTractionLocked: 0
-  canMove: 0
 --- !u!82 &2842083253634460583
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12168,47 +12171,47 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3378474654383358914}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9fc8e08a028fab44b4680510abd825e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  currentWaypoint: {fileID: 0}
+  nextWaypoint: {fileID: 0}
   maxSpeed: 50
+  acceleration: 3
+  braking: 30
   turnSpeed: 2
-  distanceThreshold: 2
+  sharpTurnSlowdown: 50
+--- !u!114 &8315835254620516374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3378474654383358914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c21138962bc91e47bbbfd348590be9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  maxSpeed: 0
+  maxReverseSpeed: 0
+  accelerationMultiplier: 0
+  brakeForce: 0
+  maxSteeringAngle: 0
+  steeringSpeed: 0
+  frontLeftMesh: {fileID: 0}
+  frontLeftCollider: {fileID: 0}
+  frontRightMesh: {fileID: 0}
+  frontRightCollider: {fileID: 0}
+  rearLeftMesh: {fileID: 0}
+  rearLeftCollider: {fileID: 0}
+  rearRightMesh: {fileID: 0}
+  rearRightCollider: {fileID: 0}
+  engineSound: {fileID: 0}
+  tireSound: {fileID: 0}
 --- !u!1 &4242301933968967590 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4163942240364048118, guid: 133308cdb8794744caaef026bde9e1f0,

@@ -160,7 +160,6 @@ public class PrometeoCarController : MonoBehaviour
       float RLWextremumSlip;
       WheelFrictionCurve RRwheelFriction;
       float RRWextremumSlip;
-      public bool canMove;
 
     // Start is called before the first frame update
     void Start()
@@ -292,10 +291,6 @@ public class PrometeoCarController : MonoBehaviour
       In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
       A (turn left), D (turn right) or Space bar (handbrake).
       */
-      if(!canMove)
-        {
-            ThrottleOff();
-        }
       if (useTouchControls && touchControlsSetup){
 
         if(throttlePTI.buttonPressed){
@@ -430,7 +425,8 @@ public class PrometeoCarController : MonoBehaviour
           if((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f)){
             if(!tireScreechSound.isPlaying){
               tireScreechSound.Play();
-              tireScreechSound.GetComponent<AudioSource>().volume = 1;
+              if(carRigidbody.velocity.magnitude > 0.25f)
+                tireScreechSound.GetComponent<AudioSource>().volume = 1;
             }
           }else if((!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f)){
             tireScreechSound.Stop();

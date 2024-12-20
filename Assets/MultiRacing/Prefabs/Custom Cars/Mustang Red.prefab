@@ -632,7 +632,7 @@ PrefabInstance:
     - target: {fileID: 5618575824624948739, guid: 7014cc0a88068fa42a71646af935782e,
         type: 3}
       propertyPath: m_Volume
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5618575824624948739, guid: 7014cc0a88068fa42a71646af935782e,
         type: 3}
@@ -672,6 +672,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5735037731853045481}
+    - targetCorrespondingSourceObject: {fileID: 1663456704294997890, guid: 7014cc0a88068fa42a71646af935782e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6894539033534755745}
     - targetCorrespondingSourceObject: {fileID: 3398106579700710293, guid: 7014cc0a88068fa42a71646af935782e,
         type: 3}
       insertIndex: -1
@@ -824,44 +828,44 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4251120006934183638}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9fc8e08a028fab44b4680510abd825e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  currentWaypoint: {fileID: 0}
+  nextWaypoint: {fileID: 0}
   maxSpeed: 50
+  acceleration: 3
+  braking: 30
   turnSpeed: 2
-  distanceThreshold: 2
+  sharpTurnSlowdown: 50
+--- !u!114 &6894539033534755745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4251120006934183638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c21138962bc91e47bbbfd348590be9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  maxSpeed: 0
+  maxReverseSpeed: 0
+  accelerationMultiplier: 0
+  brakeForce: 0
+  maxSteeringAngle: 0
+  steeringSpeed: 0
+  frontLeftMesh: {fileID: 0}
+  frontLeftCollider: {fileID: 0}
+  frontRightMesh: {fileID: 0}
+  frontRightCollider: {fileID: 0}
+  rearLeftMesh: {fileID: 0}
+  rearLeftCollider: {fileID: 0}
+  rearRightMesh: {fileID: 0}
+  rearRightCollider: {fileID: 0}
+  engineSound: {fileID: 0}
+  tireSound: {fileID: 0}

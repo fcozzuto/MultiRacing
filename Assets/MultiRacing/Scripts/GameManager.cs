@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class GameManager : MonoBehaviour
     public List<GameObject> carPrefabs; // List of all car prefabs
     public int selectedCarIndex = -1; // Index of the player's chosen car (-1 for Quick Start)
     public int humanPlayerCount = 1; // Number of human players (future multiplayer support)
+    private List<GameObject> playerCars = new List<GameObject>();
+    private List<GameObject> AICars = new List<GameObject>();
 
     [Header("Scene Settings")]
     public List<Transform> spawnPoints; // Spawn points for cars
@@ -53,7 +56,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"Returning to Racing: SpawnPoints={StaticData.SpawnPoints.Count}, Waypoints={StaticData.Waypoints?.Length}");
 
-            // Start the race logic if a car is selected
             if (selectedCarIndex != -1)
             {
                 Debug.Log("Car selected, setting up race scene.");
@@ -244,8 +246,9 @@ public class GameManager : MonoBehaviour
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = true;
 
-        var aiController = car.GetComponent<AICarController>();
-        if (aiController) aiController.enabled = false;
+        var aiPrometeoController = car.GetComponent<AIPrometeoCarController>();
+        if (aiPrometeoController) Destroy(aiPrometeoController);
+        playerCars.Add(car);
     }
 
     private void SetupAICar(GameObject car)
@@ -260,37 +263,54 @@ public class GameManager : MonoBehaviour
         }
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
-        if (prometeoController) prometeoController.enabled = false;
+        var aiController = car.GetComponent<AIPrometeoCarController>();
 
-        var aiController = car.GetComponent<AICarController>();
-        if (aiController)
+        if (aiController && prometeoController)
         {
-            aiController.enabled = true;
-            aiController.waypoints = waypoints; // Assign waypoints to the AI car
-            Debug.Log($"Assigned {waypoints.Length} waypoints to AI car: {car.name}");
+            // Transfer core stats
+            aiController.maxSpeed = prometeoController.maxSpeed;
+            aiController.maxReverseSpeed = prometeoController.maxReverseSpeed;
+            aiController.accelerationMultiplier = prometeoController.accelerationMultiplier;
+            aiController.brakeForce = prometeoController.brakeForce;
+            aiController.maxSteeringAngle = prometeoController.maxSteeringAngle;
+            aiController.steeringSpeed = prometeoController.steeringSpeed;
+
+            aiController.frontLeftMesh = prometeoController.frontLeftMesh;
+            aiController.frontLeftCollider = prometeoController.frontLeftCollider;
+            aiController.frontRightMesh = prometeoController.frontRightMesh;
+            aiController.frontRightCollider = prometeoController.frontRightCollider;
+            aiController.rearLeftMesh = prometeoController.rearLeftMesh;
+            aiController.rearLeftCollider = prometeoController.rearLeftCollider;
+            aiController.rearRightMesh = prometeoController.rearRightMesh;
+            aiController.rearRightCollider = prometeoController.rearRightCollider;
+            aiController.engineSound = prometeoController.carEngineSound;
+            aiController.tireSound = prometeoController.tireScreechSound;
+
+            aiController.currentWaypoint = waypoints[0];
         }
+
+        if (prometeoController)
+        {
+            prometeoController.enabled = false; // Disable player control for AI cars
+            Destroy(prometeoController);
+        }
+        AICars.Add(car);
     }
 
     private IEnumerator StartCountdown()
     {
         string[] countdownTexts = { "3", "2", "1", "GO!" };
 
-        // Freeze all cars (both player and AI)
-        foreach (GameObject car in allCars)
+        foreach (GameObject playerCar in playerCars)
         {
-            var prometeoController = car.GetComponent<PrometeoCarController>();
-            if (prometeoController)
-            {
-                prometeoController.canMove = false; // Freeze
-                Debug.Log($"Froze player car: {car.name}");
-            }
+            var prometeoController = playerCar.GetComponent<PrometeoCarController>();
+            prometeoController.enabled = false;
+        }
 
-            var aiController = car.GetComponent<AICarController>();
-            if (aiController)
-            {
-                aiController.enabled = false; // Freeze AI
-                Debug.Log($"Froze AI car: {car.name}");
-            }
+        foreach (GameObject AICar in AICars)
+        {
+            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
+            aIPrometeoCarController.enabled = false;
         }
 
         for (int i = 0; i < countdownTexts.Length; i++)
@@ -300,13 +320,16 @@ public class GameManager : MonoBehaviour
         }
 
         // Unfreeze all cars
-        foreach (GameObject car in allCars)
+        foreach (GameObject playerCar in playerCars)
         {
-            var prometeoController = car.GetComponent<PrometeoCarController>();
-            if (prometeoController) prometeoController.canMove = true;
+            var prometeoController = playerCar.GetComponent<PrometeoCarController>();
+            prometeoController.enabled = true;
+        }
 
-            var aiController = car.GetComponent<AICarController>();
-            if (aiController) aiController.enabled = true; // Enable AI after countdown
+        foreach (GameObject AICar in AICars)
+        {
+            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
+            aIPrometeoCarController.enabled = true;
         }
 
         countdownText.text = ""; // Clear countdown text after "GO!"

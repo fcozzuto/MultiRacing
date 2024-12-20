@@ -601,6 +601,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
+      propertyPath: m_Volume
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
       value: 0
       objectReference: {fileID: 0}
@@ -627,6 +632,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4025068612070155221}
+    - targetCorrespondingSourceObject: {fileID: 1296956597419113522, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3716176741649017311}
   m_SourcePrefab: {fileID: 100100000, guid: 9d67538aec7ae3f4da9f138ee48fae0a, type: 3}
 --- !u!1 &1548578044009756440 stripped
 GameObject:
@@ -641,47 +650,47 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1548578044009756440}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9fc8e08a028fab44b4680510abd825e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  currentWaypoint: {fileID: 0}
+  nextWaypoint: {fileID: 0}
   maxSpeed: 50
+  acceleration: 3
+  braking: 30
   turnSpeed: 2
-  distanceThreshold: 2
+  sharpTurnSlowdown: 50
+--- !u!114 &3716176741649017311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548578044009756440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c21138962bc91e47bbbfd348590be9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  maxSpeed: 0
+  maxReverseSpeed: 0
+  accelerationMultiplier: 0
+  brakeForce: 0
+  maxSteeringAngle: 0
+  steeringSpeed: 0
+  frontLeftMesh: {fileID: 0}
+  frontLeftCollider: {fileID: 0}
+  frontRightMesh: {fileID: 0}
+  frontRightCollider: {fileID: 0}
+  rearLeftMesh: {fileID: 0}
+  rearLeftCollider: {fileID: 0}
+  rearRightMesh: {fileID: 0}
+  rearRightCollider: {fileID: 0}
+  engineSound: {fileID: 0}
+  tireSound: {fileID: 0}
 --- !u!4 &2177058492800298402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1924276790796461704, guid: 9d67538aec7ae3f4da9f138ee48fae0a,

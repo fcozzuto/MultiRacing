@@ -5409,6 +5409,7 @@ GameObject:
   - component: {fileID: 4420592773348140070}
   - component: {fileID: 5240062791215855093}
   - component: {fileID: 7696847634164977983}
+  - component: {fileID: 6826934016925518405}
   m_Layer: 0
   m_Name: Prometheus Red
   m_TagString: Untagged
@@ -5512,7 +5513,6 @@ MonoBehaviour:
   carSpeed: 0
   isDrifting: 0
   isTractionLocked: 0
-  canMove: 0
 --- !u!82 &3699564784890723145
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5651,47 +5651,47 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1937941311645303246}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9fc8e08a028fab44b4680510abd825e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  currentWaypoint: {fileID: 0}
+  nextWaypoint: {fileID: 0}
   maxSpeed: 50
+  acceleration: 3
+  braking: 30
   turnSpeed: 2
-  distanceThreshold: 2
+  sharpTurnSlowdown: 50
+--- !u!114 &6826934016925518405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937941311645303246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c21138962bc91e47bbbfd348590be9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  maxSpeed: 0
+  maxReverseSpeed: 0
+  accelerationMultiplier: 0
+  brakeForce: 0
+  maxSteeringAngle: 0
+  steeringSpeed: 0
+  frontLeftMesh: {fileID: 0}
+  frontLeftCollider: {fileID: 0}
+  frontRightMesh: {fileID: 0}
+  frontRightCollider: {fileID: 0}
+  rearLeftMesh: {fileID: 0}
+  rearLeftCollider: {fileID: 0}
+  rearRightMesh: {fileID: 0}
+  rearRightCollider: {fileID: 0}
+  engineSound: {fileID: 0}
+  tireSound: {fileID: 0}
 --- !u!1 &2035120811901375248
 GameObject:
   m_ObjectHideFlags: 0
@@ -12546,7 +12546,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f632e2ace80a32e47a2c531f64901a50, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
