@@ -12,6 +12,7 @@ public class Waypoint : MonoBehaviour
         if (aiCar != null)
         {
             aiCar.SetNextWaypoint(nextWaypoint);
+            Debug.Log($"Waypoint {name} reached by {aiCar.name}");
         }
     }
 */

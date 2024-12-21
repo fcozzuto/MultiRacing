@@ -146,6 +146,8 @@ public class PrometeoCarController : MonoBehaviour
       bool deceleratingCar;
       bool touchControlsSetup = false;
       private CarLights carLights;
+      private ModifyVolume volumeModifier;
+
 
     /*
     The following variables are used to store information about sideways friction of the wheels (such as
@@ -164,10 +166,13 @@ public class PrometeoCarController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-      //In this part, we set the 'carRigidbody' value with the Rigidbody attached to this
-      //gameObject. Also, we define the center of mass of the car with the Vector3 given
-      //in the inspector.
-      carRigidbody = gameObject.GetComponent<Rigidbody>();
+
+        volumeModifier = FindFirstObjectByType<ModifyVolume>();
+        if (volumeModifier == null) Debug.LogWarning("ModifyVolume component not found");
+        //In this part, we set the 'carRigidbody' value with the Rigidbody attached to this
+        //gameObject. Also, we define the center of mass of the car with the Vector3 given
+        //in the inspector.
+        carRigidbody = gameObject.GetComponent<Rigidbody>();
       carRigidbody.centerOfMass = bodyMassCenter;
       carLights = GetComponent<CarLights>();
 
@@ -800,4 +805,39 @@ public class PrometeoCarController : MonoBehaviour
       }
     }
 
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("AI"))
+        {
+            // Trigger effects immediately
+            if (volumeModifier != null)
+            {
+                volumeModifier.FlashVignette();
+                volumeModifier.FlashChromaticAberration();
+                AudioManager.Instance.PlaySpecificClip("CarCrash");
+            }
+            else
+            {
+                Debug.LogWarning("ModifyVolume component not found on Enter collision");
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("AI"))
+        {
+            // Trigger effects immediately
+            if (volumeModifier != null)
+            {
+                volumeModifier.RevertChromaticAberration();
+                volumeModifier.RevertVignette();
+                AudioManager.Instance.StopSpecificClip("CarCrash");
+            }
+            else
+            {
+                Debug.LogWarning("ModifyVolume component not found on Exit collision");
+            }
+        }
+    }
 }

@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class AIPrometeoCarController : MonoBehaviour
 {
     public Transform currentWaypoint;
     private Rigidbody carRigidbody;
+    public TMP_Text speedText;
 
     // Copy fields from PrometeoCarController
     public int maxSpeed;
@@ -59,11 +62,6 @@ public class AIPrometeoCarController : MonoBehaviour
                 tireSound.volume = 0f;
                 tireSound.Play();
             }
-
-            //brakeForce *= 50;
-            //maxSteeringAngle *= 3;
-            //accelerationMultiplier *= 2;
-            //maxSpeed *= 2;
         }
     }
 
@@ -78,44 +76,6 @@ public class AIPrometeoCarController : MonoBehaviour
         UpdateWheelMeshes();
     }
 
-    /*    private void NavigateToWaypoint()
-        {
-            if (!currentWaypoint) return;
-
-            // Calculate direction to the waypoint
-            Vector3 directionToWaypoint = (currentWaypoint.position - transform.position).normalized;
-
-            // Calculate steering angle
-            Vector3 localTarget = transform.InverseTransformPoint(currentWaypoint.position);
-            steerAngle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
-
-            // Clamp the steering angle
-            steerAngle = Mathf.Clamp(steerAngle, -maxSteeringAngle, maxSteeringAngle);
-
-            // Apply steering to front wheels
-            frontLeftCollider.steerAngle = steerAngle;
-            frontRightCollider.steerAngle = steerAngle;
-
-            // Adjust speed dynamically based on sharpness
-            curveSharpness = Mathf.Abs(steerAngle) / maxSteeringAngle;
-            Debug.Log($"Curve sharpness is {curveSharpness}");
-            float adjustedMaxSpeed = Mathf.Lerp(maxSpeed * 0.5f, maxSpeed, 1f - curveSharpness);
-
-            // Adjust throttle based on distance to the waypoint
-            float distanceToWaypoint = Vector3.Distance(transform.position, currentWaypoint.position);
-            if (distanceToWaypoint < 5f) // Slow down near waypoints
-            {
-                throttleAxis = Mathf.Max(0, throttleAxis - brakeForce * Time.fixedDeltaTime);
-            }
-            else
-            {
-                throttleAxis = Mathf.Min(adjustedMaxSpeed / maxSpeed, throttleAxis + accelerationMultiplier * Time.fixedDeltaTime);
-            }
-
-            // Apply throttle
-            ApplyThrottle();
-        }
-    */
     private void NavigateToWaypoint()
     {
         if (!currentWaypoint) return;
@@ -129,8 +89,8 @@ public class AIPrometeoCarController : MonoBehaviour
         steerAngle = Mathf.Clamp(steerAngle, -maxSteeringAngle, maxSteeringAngle);
 
         // Apply steering to front wheels
-        frontLeftCollider.steerAngle = steerAngle;
-        frontRightCollider.steerAngle = steerAngle;
+        if (frontLeftCollider != null) frontLeftCollider.steerAngle = steerAngle;
+        if (frontRightCollider != null) frontRightCollider.steerAngle = steerAngle;
 
         // Adjust speed dynamically based on sharpness
         curveSharpness = Mathf.Abs(steerAngle) / maxSteeringAngle;
@@ -139,52 +99,120 @@ public class AIPrometeoCarController : MonoBehaviour
         // Apply deceleration logic
         DecelerateCar(curveSharpness, adjustedMaxSpeed);
 
+        // Adjust speed for upcoming sharp turns
+        AdjustSpeedForSharpTurns();
+
         // Apply throttle
         ApplyThrottle();
     }
 
+    private void AdjustSpeedForSharpTurns()
+    {
+        if (currentWaypoint == null) return;
+
+        // Look ahead to the next waypoint
+        Transform nextWaypoint = GetNextWaypoint();
+        if (nextWaypoint == null) return;
+
+        // Calculate the angle between the current direction and the direction to the next waypoint
+        Vector3 currentDirection = transform.forward;
+        Vector3 nextDirection = (nextWaypoint.position - currentWaypoint.position).normalized;
+        float angleBetweenDirections = Vector3.Angle(currentDirection, nextDirection);
+        float currentSpeed = carRigidbody.velocity.magnitude * 3.6f; // Convert to km/h
+
+        // If the angle is sharp, reduce speed
+        if (angleBetweenDirections > 30f)
+        {
+            Brake();
+            throttleAxis = Mathf.Max(0, throttleAxis - brakeForce * Time.fixedDeltaTime * 9f); // Reduce speed more aggressively
+        }
+        else 
+        {
+            ReleaseBreaks();
+            throttleAxis = Mathf.Min(1, throttleAxis + accelerationMultiplier * Time.fixedDeltaTime);
+            ApplyThrottle();
+        }
+    }
+
+    private Transform GetNextWaypoint()
+    {
+        return currentWaypoint.GetComponent<Waypoint>().nextWaypoint;
+    }
+
     private void DecelerateCar(float sharpness, float targetSpeed)
     {
+        if (carRigidbody == null) return;
         float currentSpeed = carRigidbody.velocity.magnitude * 3.6f; // Convert to km/h
-        if (sharpness > 0.75f || currentSpeed > targetSpeed)
+
+        if (sharpness > 0.5f && currentSpeed > 30f)
         {
+            Debug.Log($"Current Speed is: {currentSpeed}, while Target Speed is: {targetSpeed}");
             // Apply braking if curve is sharp or speed exceeds target
-            throttleAxis = Mathf.Max(0, throttleAxis - brakeForce * Time.fixedDeltaTime);
-            rearLeftCollider.brakeTorque = brakeForce;
-            rearRightCollider.brakeTorque = brakeForce;
-            Debug.Log($"Braking car {gameObject.GetType().Name}");
+            ThrottleOff();
+            Brake();
         }
         else
         {
             // Release brakes and accelerate
+            ReleaseBreaks();
             throttleAxis = Mathf.Min(1, throttleAxis + accelerationMultiplier * Time.fixedDeltaTime);
-            rearLeftCollider.brakeTorque = 0;
-            rearRightCollider.brakeTorque = 0;
-            //Debug.Log($"Accelerating car {gameObject.GetType().Name}");
+            ApplyThrottle();
+        }
+    }
+
+    private void ReleaseBreaks()
+    {
+        if (frontLeftCollider != null) frontLeftCollider.brakeTorque = 0;
+        if (frontRightCollider != null) frontRightCollider.brakeTorque = 0;
+        if (rearLeftCollider != null) rearLeftCollider.brakeTorque = 0;
+        if (rearRightCollider != null) rearRightCollider.brakeTorque = 0;
+    }
+
+    private void Brake()
+    {
+        if (frontLeftCollider != null) frontLeftCollider.brakeTorque = brakeForce;
+        if (frontRightCollider != null) frontRightCollider.brakeTorque = brakeForce;
+        if (rearLeftCollider != null) rearLeftCollider.brakeTorque = brakeForce;
+        if (rearRightCollider != null) rearRightCollider.brakeTorque = brakeForce;
+        if (carRigidbody.velocity.magnitude > 15f)
+        {
+            carRigidbody.velocity *= (1f / (1f + (0.025f / 2f)));
+        }
+        else
+        {
+            ReleaseBreaks();
+            ApplyThrottle();
         }
     }
 
     private void ApplyThrottle()
     {
+        throttleAxis = throttleAxis + (Time.deltaTime * 3f);
+        if (throttleAxis > 1f)
+        {
+            throttleAxis = 1f;
+        }
         float motorTorque = (accelerationMultiplier * 50f) * throttleAxis;
-        if (curveSharpness > 0.2f)
-        {
-            frontLeftCollider.motorTorque = 0;
-            frontRightCollider.motorTorque = 0;
-        }
-        else
-        {
-            frontLeftCollider.motorTorque = motorTorque;
-            frontRightCollider.motorTorque = motorTorque;
-        }
-        rearLeftCollider.motorTorque = motorTorque;
-        rearRightCollider.motorTorque = motorTorque;
+        if (frontLeftCollider != null) frontLeftCollider.motorTorque = motorTorque;
+        if (frontRightCollider != null) frontRightCollider.motorTorque = motorTorque;
+        if (rearLeftCollider != null) rearLeftCollider.motorTorque = motorTorque;
+        if (rearRightCollider != null) rearRightCollider.motorTorque = motorTorque;
+    }
+
+    public void ThrottleOff()
+    {
+        if (frontLeftCollider != null) frontLeftCollider.motorTorque = 0;
+        if (frontRightCollider != null) frontRightCollider.motorTorque = 0;
+        if (rearLeftCollider != null) rearLeftCollider.motorTorque = 0;
+        if (rearRightCollider != null) rearRightCollider.motorTorque = 0;
     }
 
     private void ApplyAntiRollBars()
     {
-        ApplyAntiRoll(frontLeftCollider, frontRightCollider);
-        ApplyAntiRoll(rearLeftCollider, rearRightCollider);
+        if (frontLeftCollider != null && frontRightCollider != null)
+            ApplyAntiRoll(frontLeftCollider, frontRightCollider);
+        if (rearLeftCollider != null && rearRightCollider != null)
+            ApplyAntiRoll(rearLeftCollider, rearRightCollider);
     }
 
     private void ApplyAntiRoll(WheelCollider leftWheel, WheelCollider rightWheel)
@@ -220,14 +248,16 @@ public class AIPrometeoCarController : MonoBehaviour
 
     private void UpdateWheelMeshes()
     {
-        UpdateWheelMesh(frontLeftCollider, frontLeftMesh.transform);
-        UpdateWheelMesh(frontRightCollider, frontRightMesh.transform);
-        UpdateWheelMesh(rearLeftCollider, rearLeftMesh.transform);
-        UpdateWheelMesh(rearRightCollider, rearRightMesh.transform);
+        UpdateWheelMesh(frontLeftCollider, frontLeftMesh?.transform);
+        UpdateWheelMesh(frontRightCollider, frontRightMesh?.transform);
+        UpdateWheelMesh(rearLeftCollider, rearLeftMesh?.transform);
+        UpdateWheelMesh(rearRightCollider, rearRightMesh?.transform);
     }
 
     private void UpdateWheelMesh(WheelCollider wheelCollider, Transform wheelMesh)
     {
+        if (wheelCollider == null || wheelMesh == null) return;
+
         Vector3 position;
         Quaternion rotation;
         wheelCollider.GetWorldPose(out position, out rotation);
@@ -239,7 +269,7 @@ public class AIPrometeoCarController : MonoBehaviour
     {
         if (engineSound != null)
         {
-            enginePitch = Mathf.Lerp(1f, 3f, throttleAxis);
+            enginePitch = Mathf.Lerp(0f, 0.5f, throttleAxis);
             engineSound.pitch = enginePitch;
         }
 
@@ -247,12 +277,17 @@ public class AIPrometeoCarController : MonoBehaviour
         {
             // Adjust tire sound volume based on steering intensity
             float steeringIntensity = Mathf.Abs(frontLeftCollider.steerAngle / maxSteeringAngle);
-            tireSound.volume = Mathf.Lerp(0f, 1f, steeringIntensity);
+            tireSound.volume = Mathf.Lerp(0f, 0.25f, steeringIntensity);
         }
     }
 
     public void SetNextWaypoint(Transform nextWaypoint)
     {
         currentWaypoint = nextWaypoint;
+    }
+
+    internal Transform GetLastValidWaypoint()
+    {
+        return currentWaypoint;
     }
 }

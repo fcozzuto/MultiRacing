@@ -517,7 +517,17 @@ PrefabInstance:
     - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
       propertyPath: m_Volume
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3008969451254533395, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3008969451505158928, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
@@ -564,6 +574,11 @@ PrefabInstance:
       propertyPath: handbrakeDriftMultiplier
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 4640566178882779877, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5100812965331877722, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -606,8 +621,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
+      propertyPath: MaxDistance
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409754274850874803, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
+        type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -639,11 +659,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1296956597419113522, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3302638895454495463}
-    - targetCorrespondingSourceObject: {fileID: 1296956597419113522, guid: 9d67538aec7ae3f4da9f138ee48fae0a,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5865822725539402701}
+      addedObject: {fileID: -5608818367478560337}
   m_SourcePrefab: {fileID: 100100000, guid: 9d67538aec7ae3f4da9f138ee48fae0a, type: 3}
 --- !u!1 &1548578044009756440 stripped
 GameObject:
@@ -683,6 +699,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWaypoint: {fileID: 0}
+  speedText: {fileID: 0}
   maxSpeed: 0
   maxReverseSpeed: 0
   accelerationMultiplier: 0
@@ -700,56 +717,27 @@ MonoBehaviour:
   antiRollForce: 20000
   engineSound: {fileID: 0}
   tireSound: {fileID: 0}
---- !u!195 &3302638895454495463
-NavMeshAgent:
+--- !u!65 &-5608818367478560337
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1548578044009756440}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 5
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &5865822725539402701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548578044009756440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 586c007f3a52f7a4f8f091d53ba5be12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentWaypoint: {fileID: 0}
-  waypoints: []
-  maxSpeed: 0
-  accelerationMultiplier: 0
-  brakeForce: 0
-  maxSteeringAngle: 0
-  frontLeftMesh: {fileID: 0}
-  frontLeftCollider: {fileID: 0}
-  frontRightMesh: {fileID: 0}
-  frontRightCollider: {fileID: 0}
-  rearLeftMesh: {fileID: 0}
-  rearLeftCollider: {fileID: 0}
-  rearRightMesh: {fileID: 0}
-  rearRightCollider: {fileID: 0}
-  engineSound: {fileID: 0}
-  tireSound: {fileID: 0}
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!4 &2177058492800298402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1924276790796461704, guid: 9d67538aec7ae3f4da9f138ee48fae0a,

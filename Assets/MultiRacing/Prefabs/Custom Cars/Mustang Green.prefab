@@ -466,7 +466,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 200207086997919110, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
         type: 3}
+      propertyPath: MaxDistance
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 200207086997919110, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
+        type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 698783393967114960, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1089224377355325295, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
@@ -592,7 +602,17 @@ PrefabInstance:
     - target: {fileID: 6923730647666310438, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
         type: 3}
       propertyPath: m_Volume
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6923730647666310438, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 6923730647666310438, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6923730647666310439, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
         type: 3}
@@ -639,11 +659,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6353381389888785415, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5759967776039769805}
-    - targetCorrespondingSourceObject: {fileID: 6353381389888785415, guid: 3f71a0d4093c0bb4297e498c52e8af2b,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 353846589492955878}
+      addedObject: {fileID: 223779590071005556}
   m_SourcePrefab: {fileID: 100100000, guid: 3f71a0d4093c0bb4297e498c52e8af2b, type: 3}
 --- !u!4 &3842718238822565479 stripped
 Transform:
@@ -689,6 +705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWaypoint: {fileID: 0}
+  speedText: {fileID: 0}
   maxSpeed: 0
   maxReverseSpeed: 0
   accelerationMultiplier: 0
@@ -706,53 +723,24 @@ MonoBehaviour:
   antiRollForce: 20000
   engineSound: {fileID: 0}
   tireSound: {fileID: 0}
---- !u!195 &5759967776039769805
-NavMeshAgent:
+--- !u!65 &223779590071005556
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4476511287800454365}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 5
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &353846589492955878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4476511287800454365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 586c007f3a52f7a4f8f091d53ba5be12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentWaypoint: {fileID: 0}
-  waypoints: []
-  maxSpeed: 0
-  accelerationMultiplier: 0
-  brakeForce: 0
-  maxSteeringAngle: 0
-  frontLeftMesh: {fileID: 0}
-  frontLeftCollider: {fileID: 0}
-  frontRightMesh: {fileID: 0}
-  frontRightCollider: {fileID: 0}
-  rearLeftMesh: {fileID: 0}
-  rearLeftCollider: {fileID: 0}
-  rearRightMesh: {fileID: 0}
-  rearRightCollider: {fileID: 0}
-  engineSound: {fileID: 0}
-  tireSound: {fileID: 0}
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}

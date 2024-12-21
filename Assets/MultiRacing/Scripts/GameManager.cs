@@ -4,7 +4,10 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using System.Linq;
-using UnityEngine.AI;
+using Unity.VisualScripting;
+using UnityEngine.UI;
+using UnityEngine.Rendering;
+using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,13 +24,18 @@ public class GameManager : MonoBehaviour
     public List<Transform> spawnPoints; // Spawn points for cars
     public Transform[] waypoints; // Waypoints for AI cars
     public GameObject mainMenuCanvas; // Main Menu Canvas in the Racing scene
+    public GameObject pauseGameCanvas; // Pause Menu Canvas in the Racing scene
     public GameObject guiCanvas; // GUI Canvas (for ranking, lap time, etc.)
     public TMP_Text countdownText; // Text element for the countdown (centered in GUI Canvas)
+    public TMP_Text lap1RecordText;
+    public TMP_Text lap2RecordText;
+    public TMP_Text lapCountText;
     public Camera mainCamera; // Main Camera in the Racing scene
 
     [Header("Race Settings")]
     public List<GameObject> allCars; // List of spawned cars
     public bool raceStarted = false;
+    public bool raceFinished = false;
 
     private void Awake()
     {
@@ -78,6 +86,71 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (raceFinished)
+            {
+                QuitGame();
+            }
+            else if (raceStarted && !raceFinished)
+            {
+                PauseGame();
+                OpenPauseMenu();
+            }
+            else
+            {
+                CloseMenu();
+                ResumeGame();
+            }
+        }
+    }
+
+    private void OpenPauseMenu()
+    {
+        OpenMenu();
+        mainMenuCanvas.SetActive(false);
+        pauseGameCanvas.SetActive(true);
+
+    }
+
+    public void ResumeRace()
+    {
+        ClosePauseMenu();
+        ResumeGame();
+    }
+
+    private void ClosePauseMenu()
+    {
+        mainCamera.enabled = false;
+        pauseGameCanvas.SetActive(false);
+        guiCanvas.SetActive(true);
+    }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
+    }
+
+    private void CloseMenu()
+    {
+        mainCamera.enabled = false;
+        mainMenuCanvas.SetActive(false);
+        guiCanvas.SetActive(true);
+    }
+
+    private void OpenMenu()
+    {
+        mainCamera.enabled = true;
+        mainMenuCanvas.SetActive(true);
+        guiCanvas.SetActive(false);
+    }
+
     private void HandleRacingSceneLoad()
     {
         if (mainMenuCanvas == null)
@@ -94,6 +167,11 @@ public class GameManager : MonoBehaviour
                     countdownText = textObj;
                 }
             }
+        }
+        if(pauseGameCanvas == null)
+        {
+            pauseGameCanvas = GameObject.Find("PauseMenuCanvas");
+            pauseGameCanvas.SetActive(false);
         }
         if (mainCamera == null)
         {
@@ -245,16 +323,12 @@ public class GameManager : MonoBehaviour
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
         if (prometeoController) prometeoController.enabled = true;
+        prometeoController.useUI = true;
+        prometeoController.carSpeedText = guiCanvas.transform.Find("Speed Text").GetComponent<Text>();
 
         var aiPrometeoController = car.GetComponent<AIPrometeoCarController>();
         if (aiPrometeoController) Destroy(aiPrometeoController);
-
-        var navMeshController = car.GetComponent<NavMeshAICarController>();
-        if (navMeshController) Destroy(navMeshController);
-
-        var agent = car.GetComponent<NavMeshAgent>();
-        if (agent != null) agent.enabled = false;
-
+        car.tag = "Player";
         playerCars.Add(car);
     }
 
@@ -271,36 +345,29 @@ public class GameManager : MonoBehaviour
 
         var prometeoController = car.GetComponent<PrometeoCarController>();
         var aiController = car.GetComponent<AIPrometeoCarController>();
-        if (aiController) Destroy(aiController);
 
-        var navMeshController = car.GetComponent<NavMeshAICarController>();
-        if (navMeshController) navMeshController.enabled = true;
-        var agent = car.GetComponent<NavMeshAgent>();
-        if (agent != null) agent.enabled = true;
-
-        if (navMeshController && prometeoController)
+        if (aiController && prometeoController)
         {
             // Transfer core stats
-            navMeshController.maxSpeed = prometeoController.maxSpeed;
-            //navMeshController.maxReverseSpeed = prometeoController.maxReverseSpeed;
-            navMeshController.accelerationMultiplier = prometeoController.accelerationMultiplier;
-            navMeshController.brakeForce = prometeoController.brakeForce;
-            navMeshController.maxSteeringAngle = prometeoController.maxSteeringAngle;
-            //navMeshController.steeringSpeed = prometeoController.steeringSpeed;
+            aiController.maxSpeed = prometeoController.maxSpeed;
+            aiController.maxReverseSpeed = prometeoController.maxReverseSpeed;
+            aiController.accelerationMultiplier = prometeoController.accelerationMultiplier;
+            aiController.brakeForce = prometeoController.brakeForce;
+            aiController.maxSteeringAngle = prometeoController.maxSteeringAngle;
+            aiController.steeringSpeed = prometeoController.steeringSpeed;
 
-            navMeshController.frontLeftMesh = prometeoController.frontLeftMesh;
-            navMeshController.frontLeftCollider = prometeoController.frontLeftCollider;
-            navMeshController.frontRightMesh = prometeoController.frontRightMesh;
-            navMeshController.frontRightCollider = prometeoController.frontRightCollider;
-            navMeshController.rearLeftMesh = prometeoController.rearLeftMesh;
-            navMeshController.rearLeftCollider = prometeoController.rearLeftCollider;
-            navMeshController.rearRightMesh = prometeoController.rearRightMesh;
-            navMeshController.rearRightCollider = prometeoController.rearRightCollider;
-            navMeshController.engineSound = prometeoController.carEngineSound;
-            navMeshController.tireSound = prometeoController.tireScreechSound;
+            aiController.frontLeftMesh = prometeoController.frontLeftMesh;
+            aiController.frontLeftCollider = prometeoController.frontLeftCollider;
+            aiController.frontRightMesh = prometeoController.frontRightMesh;
+            aiController.frontRightCollider = prometeoController.frontRightCollider;
+            aiController.rearLeftMesh = prometeoController.rearLeftMesh;
+            aiController.rearLeftCollider = prometeoController.rearLeftCollider;
+            aiController.rearRightMesh = prometeoController.rearRightMesh;
+            aiController.rearRightCollider = prometeoController.rearRightCollider;
+            aiController.engineSound = prometeoController.carEngineSound;
+            aiController.tireSound = prometeoController.tireScreechSound;
 
-            //navMeshController.currentWaypoint = waypoints[0];
-            navMeshController.waypoints = waypoints;
+            aiController.currentWaypoint = waypoints[0];
         }
 
         if (prometeoController)
@@ -308,6 +375,7 @@ public class GameManager : MonoBehaviour
             prometeoController.enabled = false; // Disable player control for AI cars
             Destroy(prometeoController);
         }
+        car.tag = "AI";
         AICars.Add(car);
     }
 
@@ -323,10 +391,8 @@ public class GameManager : MonoBehaviour
 
         foreach (GameObject AICar in AICars)
         {
-            var aIPrometeoCarController = AICar.GetComponent<NavMeshAICarController>();
-            aIPrometeoCarController.enabled = false; 
-            var agent = AICar.GetComponent<NavMeshAgent>();
-            if (agent != null) agent.enabled = false;
+            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
+            aIPrometeoCarController.enabled = false;
         }
 
         for (int i = 0; i < countdownTexts.Length; i++)
@@ -344,13 +410,84 @@ public class GameManager : MonoBehaviour
 
         foreach (GameObject AICar in AICars)
         {
-            var aIPrometeoCarController = AICar.GetComponent<NavMeshAICarController>();
+            var aIPrometeoCarController = AICar.GetComponent<AIPrometeoCarController>();
             aIPrometeoCarController.enabled = true;
-            var agent = AICar.GetComponent<NavMeshAgent>();
-            if (agent != null) agent.enabled = true;
         }
 
         countdownText.text = ""; // Clear countdown text after "GO!"
         raceStarted = true;
+    }
+
+    internal void LapStarted(int lapCount)
+    {
+        if (!lapCountText)
+        {
+            if (guiCanvas == null)
+            {
+                Debug.LogError("guiCanvas is null. Ensure it is assigned correctly.");
+                return;
+            }
+
+            var textObjects = guiCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
+            Debug.Log($"Found {textObjects.Length} TMP_Text objects in guiCanvas.");
+
+            foreach (var textObj in textObjects.Where(textObj => textObj.name == "LapCountText"))
+            {
+                lapCountText = textObj;
+            }
+        }
+        if (lapCountText)
+        {
+            lapCountText.text = $"LAP {lapCount}/2";
+        }
+        else
+        {
+            Debug.LogWarning("LapsCountText not found! Ensure the object is named 'LapCountText' and is a child of guiCanvas.");
+        }
+    }
+
+    internal void LapFinished(float lapTime)
+    {
+        if (lap1RecordText == null)
+        {
+            lap1RecordText = GameObject.Find("Lap1RecordText").GetComponent<TextMeshProUGUI>();
+            lap1RecordText.text = "LAP 1 RECORD : " + lapTime.ToString("F2");
+        }
+        else if (lap2RecordText == null)
+        {
+            lap2RecordText = GameObject.Find("Lap2RecordText").GetComponent<TextMeshProUGUI>();
+            lap2RecordText.text = "LAP 2 RECORD : " + lapTime.ToString("F2");
+        }
+    }
+
+    internal void FinishRace()
+    {
+        PauseGame();
+        countdownText.text = "Congratulations! You Finished the race!\n\nThank you for playing our game!\n\nPress ESC to Quit";
+        raceFinished = true;
+    }
+
+    private void PauseGame()
+    {
+        Time.timeScale = 0f; // Stop the game
+        UnlockCursor();      // Unlock the mouse cursor
+    }
+
+    private void ResumeGame()
+    {
+        Time.timeScale = 1f; // Resume the game
+        LockCursor();        // Lock the mouse cursor if needed
+    }
+
+    private void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None; // Unlock the cursor
+        Cursor.visible = true;                    // Make the cursor visible
+    }
+
+    private void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor
+        Cursor.visible = false;                    // Make the cursor invisible
     }
 }
