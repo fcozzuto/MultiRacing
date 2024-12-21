@@ -7,6 +7,7 @@ TagManager:
   - SpawnPoint
   - Waypoint
   - AI
+  - Start
   layers:
   - Default
   - TransparentFX
